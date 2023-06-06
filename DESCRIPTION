@@ -1,0 +1,11 @@
+Package: MPHLabs
+Type: Package
+Title: Computer labs exercices for MPH students
+Version: 0.1.0
+Author: N. Le Meur and Co
+Maintainer: The package maintainer <nolwenn.lemeur@ehesp.fr>
+Description: More about what it does (maybe more than one line)
+    Use four spaces when indenting paragraphs within the Description.
+License: What license is it under?
+Encoding: UTF-8
+LazyData: true

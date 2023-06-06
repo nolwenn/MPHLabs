@@ -1,0 +1,335 @@
+---
+title: "Get started with R - MPH1 introduction course"
+output:
+  learnr::tutorial:
+    progressive: true
+    allow_skip: true
+runtime: shiny_prerendered
+description: >
+  Learn how to read data, recode, filter observations in a data frame and perfom basic statiscal summary.
+---
+
+```{r setup, include=FALSE}
+library(learnr)
+library(tidyverse)
+tutorial_options(
+  exercise.timelimit = 60,
+  # A simple checker function that just returns the message in the check chunk
+  exercise.checker = function(check_code, ...) {
+    list(
+      message = eval(parse(text = check_code)),
+      correct = logical(0),
+      type = "info",
+      location = "append"
+    )
+  }
+)
+
+options(tutorial.storage = list(
+  # save an arbitrary R object "data" to storage
+  save_object = function(tutorial_id, tutorial_version, user_id, object_id, data) {
+  },
+  # retreive a single R object from storage
+  get_object = function(tutorial_id, tutorial_version, user_id, object_id) { 
+    NULL 
+  },
+  # retreive a list of all R objects stored
+  get_objects = function(tutorial_id, tutorial_version, user_id) { 
+    list() 
+  },
+  # remove all stored R objects
+  remove_all_objects = function(tutorial_id, tutorial_version, user_id) {
+  }))
+  
+knitr::opts_chunk$set(error = TRUE, tutorial.data_dir="data")
+load("../../data/sleepapnea.Rdata")
+```
+
+## Welcome
+
+This is an **interactive version of the MPH1 computer labs** with the statistical software *R*. **Your objective is to learn the basic of R** while running online examples and trying some exercises. The tutorial uses the Sleep apnea data set, presented in the next section.
+
+### 
+
+In this tutorial, you will learn how to:
+
+-   read a dataset stored on your computer (as a CSV file)
+-   explore the data format and the different type of variables
+-   compute descriptive statistic
+-   display plots
+-   compute univariate statistical test
+-   compute simple linear and logistic regression
+
+Every R code chunk is link to a R engine and, when you hit the *Run code* button, the code is interpreted.
+
+```{r example, exercise = TRUE, exercise.eval = FALSE}
+```
+
+For the examples, we invite you to run the code and for the exercises we invite you to go beyond the example by adding arguments or completing with other R functions.
+
+[As companion websites, we invite you to look at:]{.underline}
+
+<https://nolwenn.github.io/ebook-M1-biostat/>
+
+<https://nolwenn.github.io/software-M1-biostat/>
+
+## The Sleep Apnea Study
+
+All examples and proposed exercices are base on the Sleep Apnea study.
+
+The present study deals with the sleep apnea problem. Sleep apnea is a sleep disorder characterizing by abnormal pauses in breathing during sleep. Each pause in breathing is called apnea.
+
+Sleep apnea can affect anyone at any age. Well known risk factors for sleep apnea include being a male, overweight, age over 40, stress, and having a family history of sleep apnea. If left untreated, sleep apnea can result in a growing number of health problems, including high blood pressure, stroke, heart failure, irregular heartbeats, heart attacks, diabetes, fatigue, road accidents, and depression. Indeed, as some patients can stop breathing very often, for instance, 30 times in an hour, i.e. every 2 minutes, it means that they never get restful (or restorative) sleep. Therefore, they don't feel good during the day and their activity during the night cause stress for the heart. Prevalence of sleep apnea is estimated to be between 1 and 10% in the general population.
+
+The main objective of this study is to explore in a French sample of population the determinants of the sleep apnea. The population was defined as the population hospitalized in the Rennes University hospital and aged more than 18 years old. A sampling procedure has been performed to select a random sample. Several individual characteristics have been collected. Their sleep has been monitored for a night (6 hours) and the number of pauses of breathing has been measured.
+
+## Part A -- Reading and formatting data using R
+
+### 1. Read data in R
+
+Reading functions in *R* follows common rules with similar arguments. The most important are :
+
+-   *name=* for the file name you need to read (with the path if not in your working directory)
+-   *header=* to specify if your file contains a header with column names
+-   *sep=* to specificy the type of column separator (",", ";", "/")
+
+#### The `read.csv()` function
+
+To store the output of the `read.csv()` function in a R object we use the assignment operator, `<-`. For example, here we name our object *sleepapnea*
+
+Click *Run Code* to give it a try:
+
+```{r read, exercise = TRUE, exercise.eval = FALSE}
+sleepapnea <- read.csv("data/SleepApnea.csv", header=TRUE, sep=",")
+```
+
+#### Quick verification the `head()` and `tail()` functions
+
+For a quick verification of the reading output, you can use `head()` or `tail()` to observe the first 6 or last 6 rows for your R object *sleepapnea*.
+
+Run the command below to test the `head()` function:
+
+```{r header, exercise = TRUE, exercise.eval = FALSE}
+head(sleepapnea)
+```
+
+Run the command in the code chunk below to test the `tail()` function
+
+```{r tail, exercise = TRUE, exercise.eval = FALSE}
+tail(sleepapnea)
+```
+
+Try to modify the arguments of the `tail()` function to display the last 10 rows of your object (If you need help, use `?tail` in the code chunk)
+
+```{r tailn10, exercise = TRUE}
+```
+
+```{r tailn10-solution}
+tail(sleepapnea, n=10)
+```
+
+**Good job!** You should now have a sense of :
+
+-   what is a R function,
+-   what are arguments for a function,
+-   how to the store the result of your function call using the assignment operator, `<-`, so you keep and can reuse the result later on.
+
+### 2. Data structure and variable types
+
+To Look at your data structure in the R console you can use the `str()` function.
+
+```{r str, exercise = TRUE, exercise.eval = FALSE}
+str(sleepapnea)
+```
+
+Your data set is a `data.frame` which is a rectangular R data format where variables can be of different types (e.g. numeric, character, factor...)
+
+**Looking at your object, is the output consistent with what you expected in terms of variables' types?**
+
+Note: The output of `str()` is equivalent to the visual display of the blue dot with the white arrow tag to you object's name in the the *Environment panel* of RStudio
+
+### 3. Data type conversion
+
+The *number* variable in the sleep apnea data set corresponds to the identifier of each patient. It should not be a numeric value but a character or factor (categorical variable).
+
+a.  First, we transform into character the *number* variable using the function `as.character()`. One way of doing is to overwrite the *number* variable by selecting the vector(variable) *number* in the data set using the `$` sign and applying the `as.character()`.
+
+```{r tocharacter, exercise = TRUE, exercise.eval = FALSE}
+sleepapnea$number <- as.character(sleepapnea$number)
+```
+
+Similarly, the *gender* variable should be a factor (categorical variable) and not a character.
+
+b.  Second, we need to transform the *gender* variable using `factor()`
+
+```{r tofactor, exercise = TRUE, exercise.eval = FALSE}
+summary(sleepapnea$gender)
+sleepapnea$gender <- factor(sleepapnea$gender)
+summary(sleepapnea$gender)
+```
+
+Note that we propose to use the summary function before and after to assess the result of applying the function.
+
+c.  Similarly, we need to transform the *diabetes* variable (read as a numeric) into a categorical variable using the function `factor()` and setting the argument `labels=` to "No" and "Yes" to annotate the levels 0 and 1
+
+```{r tofactorwithlabels, exercise = TRUE, exercise.eval = FALSE}
+summary(sleepapnea$diabetes)
+sleepapnea$diabetes <- factor(sleepapnea$diabetes, levels = c(0,1),
+                              labels=c("No","Yes"))
+summary(sleepapnea$diabetes)
+```
+
+d.  To practice, do the same with the *Trigly_4Classes* variable knowing that :
+
+-   classe 1 is $< 1.50$ or Normal rate
+-   classe 2 is $1.50-1.99$ or Borderline rate
+-   classe 3 is $2.00-4.99$ or High rate
+-   classe 4 is $> 5.00$ or Very high rate
+
+```{r TriglycerideCl, exercise = TRUE}
+```
+
+```{r TriglycerideCl-solution}
+sleepapnea$Triglyceride_Cl_Ref <- factor(sleepapnea$Triglyceride_Cl_Ref, levels = c(1:4),
+                              labels=c("Normal","Bordeline",
+                                       "High", "Very High"))
+```
+
+### 4. Save the clean data set
+
+To keep the results of your pre-processing and data management steps, it is recommended that you use the `save()` function to create a *Rdata file* that contains the clean version of your data set.
+
+```{r save, exercise = TRUE, exercise.eval = FALSE}
+sleepapnea_clean <- sleepapnea
+save(sleepapnea_clean, file="sleepapnea_clean.Rdata")
+```
+
+## Part B - Descriptive Analysis
+
+### 1. load your clean data set
+
+```{r, echo=FALSE}
+load("data/sleepapnea_clean.Rdata")
+```
+
+```{r load, exercise = TRUE, exercise.eval = FALSE}
+load("data/sleepapnea_clean.Rdata")
+```
+
+### 2. summary() and table() functions
+
+1.  Describe the variable gender using the functions `summary()` and `table()`
+
+```{r gendersummary, exercise = TRUE}
+```
+
+```{r gendersummary-solution}
+summary(sleepapnea_clean$gender)
+table(sleepapnea_clean$gender)
+```
+
+2.  Compute contingency table between *gender* and *diabetes* using the function `table()`
+
+```{r gender2diabetes, exercise = TRUE}
+```
+
+```{r gender2diabetes-solution}
+table("gender"=sleepapnea_clean$gender, "diabetes"=sleepapnea_clean$diabetes)
+```
+
+Using `prop.table()` to compute the proportion of diabetes among female and male
+
+```{r propgender2diabetes, exercise = TRUE}
+```
+
+```{r propgender2diabetes-solution}
+round(prop.table(table("gender"=sleepapnea_clean$gender, "diabetes"=sleepapnea_clean$diabetes), margin=1)*100, 2)
+```
+
+3.  Describe the variable age using the function `summary()`
+
+```{r agesummary, exercise = TRUE}
+```
+
+```{r agesummary-solution}
+summary(sleepapnea_clean$age)
+```
+
+4.  Compute the mean, standard deviation, mediane, quartiles for the variable age
+
+```{r agedesc, exercise = TRUE}
+```
+
+```{r agedesc-solution}
+mean(sleepapnea_clean$age, na.rm=TRUE)
+sd(sleepapnea_clean$age, na.rm=TRUE)
+median(sleepapnea_clean$age, na.rm=TRUE)
+quantile(sleepapnea_clean$age, na.rm=TRUE)
+quantile(sleepapnea_clean$age, probs= c(0, 0.3, 0.6), na.rm=TRUE)
+```
+
+5.  What is the best graph for the variable age?
+
+```{r agehistogram}
+hist(sleepapnea_clean$age, main="distribution of age", xlab="age (years)")
+```
+
+Draw the age distribution using the hist() function. Choose a width of age class of 2 years and of 5 years. Discuss about the shape of the two distributions.
+
+```{r agehist2, exercise = TRUE}
+```
+
+```{r agehist2-solution}
+hist(sleepapnea_clean$age, width=2, main="distribution of age", xlab="age (years)")
+hist(sleepapnea_clean$age, width=5, main="distribution of age", xlab="age (years)")
+```
+
+6.  The `boxplot()` function summarize the quantile parameters for a quantitative variable. Below if the boxplot for the *age* variable. Interpret it.
+
+```{r ageboxplot}
+boxplot(sleepapnea_clean$age, main="distribution of age", xlab="age (years)")
+```
+
+Draw the box plot of age by gender group. Discuss about the shape of the two distributions.
+
+```{r agebysexboxplot, exercise = TRUE}
+```
+
+```{r agebysexboxplot-solution}
+boxplot(sleepapnea_clean$age ~  sleepapnea_clean$gender,  main="distribution of age by gender group", ylab="age (years)", xlab="gender")
+```
+
+7.  Compute the confidence interval of the age variable knowing the formula follows the Normal law assumption:
+
+-   $1.96*\sigma/\sqrt{n}$
+
+```{r agebyci}
+bound <- 1.96*sd(sleepapnea_clean$age)/sqrt(length(sleepapnea_clean$age))
+# upper bound
+mean(sleepapnea_clean$age)+bound 
+# lower bound
+mean(sleepapnea_clean$age)-bound 
+```
+
+Note: The *epiDisplay* library propose the `ci()` function that computes the confidence interval. To use the function do not forget to load the library in your working session if not already done so.
+
+## Part C: Univariate analysis 
+
+### 1. Summary by strata (group)
+
+Is there an association between creatinine and diabetes status?
+
+```{r}
+library(dplyr)
+sleepapnea_clean %>% group_by(diabetes) %>% summarise("mean_crea"=mean(creatinine, na.rm = TRUE))
+```
+
+### 2. Statistical test of associations
+
+Comparison of the mean creatinine levels between diabetics and non-diabetics :
+
+a.  What is the nature of the creatinine variable?
+b.  Is the creatinine variable normally distributed? Use the appropriate test to justify your answer.
+c.  Formulate the statistical hypotheses
+d.  Choose the appropriate test
+e.  Perform the test and interpret your results
