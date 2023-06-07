@@ -1,0 +1,5 @@
+Pour l'utilisation
+
+- build du package sous R
+- library(MPHLabs)
+- learnr::run_tutorial("MPH1", package = "MPHLabs")

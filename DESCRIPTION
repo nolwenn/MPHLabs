@@ -6,6 +6,7 @@ Author: N. Le Meur and Co
 Maintainer: The package maintainer <nolwenn.lemeur@ehesp.fr>
 Description: More about what it does (maybe more than one line)
     Use four spaces when indenting paragraphs within the Description.
+Imports: learnr, rstatix, dplyr
 License: What license is it under?
 Encoding: UTF-8
 LazyData: true
