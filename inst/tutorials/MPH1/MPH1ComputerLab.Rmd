@@ -93,17 +93,13 @@ Reading functions in *R* follows common rules with similar arguments. The most i
 -   *header=* to specify if your file contains a header with column names
 -   *sep=* to specificy the type of column separator (",", ";", "/")
 
-#### The `read.csv()` function
-
-To store the output of the `read.csv()` function in a R object we use the assignment operator, `<-`. For example, here we name our object *sleepapnea*
+The `read.csv()` function is a generic function to read tabulated data set. To store the output of the `read.csv()` function in a R object we use the assignment operator, `<-`. For example, here we name our object *sleepapnea*
 
 Click *Run Code* to give it a try:
 
 ```{r read, exercise = TRUE, exercise.eval = FALSE}
 sleepapnea <- read.csv("data/SleepApnea.csv", header=TRUE, sep=",")
 ```
-
-#### Quick verification the `head()` and `tail()` functions
 
 For a quick verification of the reading output, you can use `head()` or `tail()` to observe the first 6 or last 6 rows for your R object *sleepapnea*.
 
@@ -206,19 +202,19 @@ save(sleepapnea_clean, file="sleepapnea_clean.Rdata")
 
 ## Part B - Descriptive Analysis
 
-### 1. load your clean data set
+### 1. Load your clean data set
 
-```{r, echo=FALSE}
-load("data/sleepapnea_clean.Rdata")
+```{r loadcache, echo=FALSE}
+load("../../data/sleepapnea_clean.Rdata")
 ```
 
 ```{r load, exercise = TRUE, exercise.eval = FALSE}
-load("data/sleepapnea_clean.Rdata")
+load("sleepapnea_clean.Rdata")
 ```
 
-### 2. summary() and table() functions
+### 2. The summary() and table() functions
 
-1.  Describe the variable gender using the functions `summary()` and `table()`
+a.  Describe the variable gender using the functions `summary()` and `table()`
 
 ```{r gendersummary, exercise = TRUE}
 ```
@@ -228,7 +224,7 @@ summary(sleepapnea_clean$gender)
 table(sleepapnea_clean$gender)
 ```
 
-2.  Compute contingency table between *gender* and *diabetes* using the function `table()`
+b.  Compute contingency table between *gender* and *diabetes* using the function `table()`
 
 ```{r gender2diabetes, exercise = TRUE}
 ```
@@ -246,7 +242,7 @@ Using `prop.table()` to compute the proportion of diabetes among female and male
 round(prop.table(table("gender"=sleepapnea_clean$gender, "diabetes"=sleepapnea_clean$diabetes), margin=1)*100, 2)
 ```
 
-3.  Describe the variable age using the function `summary()`
+c.  Describe the variable age using the function `summary()`
 
 ```{r agesummary, exercise = TRUE}
 ```
@@ -255,7 +251,7 @@ round(prop.table(table("gender"=sleepapnea_clean$gender, "diabetes"=sleepapnea_c
 summary(sleepapnea_clean$age)
 ```
 
-4.  Compute the mean, standard deviation, mediane, quartiles for the variable age
+d.  Compute the mean, standard deviation, mediane, quartiles for the variable age
 
 ```{r agedesc, exercise = TRUE}
 ```
@@ -268,7 +264,7 @@ quantile(sleepapnea_clean$age, na.rm=TRUE)
 quantile(sleepapnea_clean$age, probs= c(0, 0.3, 0.6), na.rm=TRUE)
 ```
 
-5.  What is the best graph for the variable age?
+e.  What is the best graph for the variable age?
 
 ```{r agehistogram}
 hist(sleepapnea_clean$age, main="distribution of age", xlab="age (years)")
@@ -284,7 +280,7 @@ hist(sleepapnea_clean$age, width=2, main="distribution of age", xlab="age (years
 hist(sleepapnea_clean$age, width=5, main="distribution of age", xlab="age (years)")
 ```
 
-6.  The `boxplot()` function summarize the quantile parameters for a quantitative variable. Below if the boxplot for the *age* variable. Interpret it.
+f.  The `boxplot()` function summarize the quantile parameters for a quantitative variable. Below if the boxplot for the *age* variable. Interpret it.
 
 ```{r ageboxplot}
 boxplot(sleepapnea_clean$age, main="distribution of age", xlab="age (years)")
@@ -299,7 +295,7 @@ Draw the box plot of age by gender group. Discuss about the shape of the two dis
 boxplot(sleepapnea_clean$age ~  sleepapnea_clean$gender,  main="distribution of age by gender group", ylab="age (years)", xlab="gender")
 ```
 
-7.  Compute the confidence interval of the age variable knowing the formula follows the Normal law assumption:
+g.  Compute the confidence interval of the age variable knowing the formula follows the Normal law assumption:
 
 -   $1.96*\sigma/\sqrt{n}$
 
@@ -313,23 +309,107 @@ mean(sleepapnea_clean$age)-bound
 
 Note: The *epiDisplay* library propose the `ci()` function that computes the confidence interval. To use the function do not forget to load the library in your working session if not already done so.
 
-## Part C: Univariate analysis 
+## Part C - Univariate analysis
 
 ### 1. Summary by strata (group)
 
-Is there an association between creatinine and diabetes status?
+Is there an association between sleep apnea and body mass index (bmi) status?
 
-```{r}
-library(dplyr)
-sleepapnea_clean %>% group_by(diabetes) %>% summarise("mean_crea"=mean(creatinine, na.rm = TRUE))
+a.  First, we need to create the bmi groups. We propose you to `cut()` the bmi (quantitative) variable into 2 groups: $<25$ for "normal" and $>25$ for "overweight"
+
+```{r cut, exercise = TRUE, exercise.eval = FALSE}
+sleepapnea_clean$bmi_2grp <- cut(sleepapnea_clean$bmi, c(0, 25, 55), include.lowest = TRUE, right=FALSE)
+levels(sleepapnea_clean$bmi_2grp) <- c("normal", "overweight")
 ```
 
-### 2. Statistical test of associations
+**Practice:** We propose you to `cut()` the bmi (quantitative) variable into 3 groups: $<25$ for "normal", $[25 to 30[$ for "overweight", and $>30$ for "obese"
 
-Comparison of the mean creatinine levels between diabetics and non-diabetics :
+```{r, bmi3grp, exercise = TRUE}
+```
 
-a.  What is the nature of the creatinine variable?
-b.  Is the creatinine variable normally distributed? Use the appropriate test to justify your answer.
-c.  Formulate the statistical hypotheses
-d.  Choose the appropriate test
-e.  Perform the test and interpret your results
+```{r bmi3grp-solution, exercise = TRUE}
+sleepapnea_clean$bmi_3grp <- cut(sleepapnea_clean$bmi, c(0, 25, 30, 55), include.lowest = TRUE, right=FALSE)
+levels(sleepapnea_clean$bmi_3grp) <- c("normal", "overweight", "obese")
+```
+
+b.  Second, we want to summarize the average of sleep apnea level by the 2 groups of bmi.
+
+```{r meanbygroup, exercise = TRUE, exercise.eval = FALSE}
+library(dplyr)
+sleepapnea_clean %>% group_by(bmi_2grp) %>% summarise("mean_apnea"=mean(SleepApnea, na.rm = TRUE))
+```
+
+**Practice:** Repeat the computation for the bmi in 3 groups
+
+```{r, meanbygroup3, exercise = TRUE}
+```
+
+```{r meanbygroup3-solution, exercise = TRUE}
+sleepapnea_clean %>% group_by(bmi_3grp) %>% summarise("mean_apnea"=mean(SleepApnea, na.rm = TRUE))
+```
+
+**Practice:** Try with other quatitative variables of the data set such as age, height or weight which could be some confounding factors
+
+### 2. Statistical tests of association
+
+**Example 1:** We would like to compare of the mean of sleep apnea among the 2 groups of bmi. What statistical tests to choose? What are the assumptions?
+
+a.  Since we consider the mean we suppose that we have normally distributed values of sleep apnea in the 2 bmi groups. Let's verify using the classical Shapiro test:
+
+```{r apneabmi, exercise = TRUE, exercise.eval = FALSE}
+by(sleepapnea_clean$SleepApnea, sleepapnea_clean$bmi_2grp, shapiro.test)
+```
+
+What are your conclusions?
+
+b.  Given the result of the Shapiro test, we choose to use the non-parametric test `wilcox.text()` to assess for a potential association. Try to apply the test and interpret the results.
+
+```{r wilcox, exercise = TRUE, exercise.eval = FALSE}
+wilcox.test(SleepApnea ~ bmi_2grp, data= sleepapnea_clean)
+```
+
+Note: For most statistical tests of association, the *R* syntax is of type formula i.e. `func(y ~ x, data=mydata)` but you might want to look at the help pages of the different test functions for the details of their usage.
+
+c.  Given the result of the Shapiro test, we can try to transform the sleep apnea measures into a logarithm scale to approach a Normal distribution and use the parametric Student T test using `t.test()`. What is your interpretation?
+
+```{r apnealog,  exercise = TRUE}
+
+```
+
+```{r apnealog-solution, exercise = TRUE, exercise.eval = FALSE}
+sleepapnea_clean$SleepApnea_log <- log(SleepApnea)
+t.test(SleepApnea_log ~ bmi_2grp, data=sleepapnea_clean)
+```
+
+**Example 2:** We would like to compare of the distribution of sleep apnea measures among the 3 groups of bmi. Given the repartition of the patients among the 3 groups of bmi, we propose to use the `kruskal.test()` non-parametric rank sum test to assess the differences (or not) between groups.
+
+```{r kruskal, exercise = TRUE, exercise.eval = FALSE}
+kruskal.test(SleepApnea ~ bmi_3grp, data= sleepapnea_clean)
+```
+
+What is your interpretation?
+
+To identify which groups differ from the other(s) you can use the `dunn_test()` from the `rstatix` library
+
+```{r dunn_test, exercise = TRUE, exercise.eval = FALSE}
+library(rstatix)
+dunn_test(SleepApnea ~ bmi_3grp, data= sleepapnea_clean)
+```
+
+**Example 3:** We would like to test whether there is an association between gender and bmi groups. What statistical tests to choose? What are the assumptions?
+
+a.  We consider the gender and bmi groups which are categorical variables. We can perform a Fisher Exact test using `fisher.test()`
+
+```{r fisher}
+fisher.test(sleepapnea_clean$gender, sleepapnea_clean$bmi_2grp)
+```
+
+b.  A similar test is the Chi Square test that you can apply using `chisq.test()`. Have a try and interpret the results.
+
+```{r chi2, exercise = TRUE}
+
+```
+
+```{r chi2-solution, exercise = TRUE}
+chisq.test(sleepapnea_clean$gender, sleepapnea_clean$bmi_2grp)
+```
