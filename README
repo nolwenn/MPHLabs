@@ -1,5 +1,22 @@
-Pour l'utilisation
+**The MPHLabs learnr module**
 
-- build du package sous R
-- library(MPHLabs)
-- learnr::run_tutorial("MPH1", package = "MPHLabs")
+This R package was build with the lab exercices proposed in my MPH1 computer lab sessions. The aim is to help students to start learning R language and some basic statistics methods by themselves at their own speed.
+
+This R package has e-book companion websites:
+https://nolwenn.github.io/software-M1-biostat/
+https://nolwenn.github.io/ebook-M1-biostat/
+
+To get started, please follow theses steps in R: 
+
+# The required packages to download and run the interactive exercices 
+install.packages("devtools") 
+install.packages("learnr")
+
+# To download and intall the MPHLabs package locally on your computer
+devtools::install_github("nolwenn/MPHLabs")
+
+# To load the functionalities of the MPHLabs library in your R envrionment
+library(MPHLabs)
+
+# To launch the browser with the interactive exercices
+learnr::run_tutorial("MPH1", package = "MPHLabs")
