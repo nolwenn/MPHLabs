@@ -43,6 +43,7 @@ options(tutorial.storage = list(
   
 knitr::opts_chunk$set(error = TRUE, tutorial.data_dir="data")
 load("../../data/sleepapnea.Rdata")
+load("../../data/sleepapnea_clean.Rdata")
 ```
 
 ## Welcome
@@ -73,6 +74,8 @@ For the examples, we invite you to run the code and for the exercises we invite 
 
 <https://nolwenn.github.io/software-M1-biostat/>
 
+This tutorial has been developed by N. Le Meur in collaboration with A. Descarpentrie.
+
 ## The Sleep Apnea Study
 
 All examples and proposed exercices are base on the Sleep Apnea study.
@@ -89,16 +92,16 @@ The main objective of this study is to explore in a French sample of population 
 
 Reading functions in *R* follows common rules with similar arguments. The most important are :
 
--   *name=* for the file name you need to read (with the path if not in your working directory)
+-   *file=* for the file name you need to read (with the path if not in your working directory)
 -   *header=* to specify if your file contains a header with column names
--   *sep=* to specificy the type of column separator (",", ";", "/")
+-   *sep=* to specify the type of column separator (",", ";", "/")
 
 The `read.csv()` function is a generic function to read tabulated data set. To store the output of the `read.csv()` function in a R object we use the assignment operator, `<-`. For example, here we name our object *sleepapnea*
 
 Click *Run Code* to give it a try:
 
-```{r read, exercise = TRUE, exercise.eval = FALSE}
-sleepapnea <- read.csv("data/SleepApnea.csv", header=TRUE, sep=",")
+```{r read, exercise = TRUE, exercise.eval = FALSE, warnings=FALSE, message=FALSE}
+sleepapnea <- read.csv(file="https://github.com/nolwenn/MPHLabs/tree/main/data/SleepApnea.csv", header=TRUE, sep=",")
 ```
 
 For a quick verification of the reading output, you can use `head()` or `tail()` to observe the first 6 or last 6 rows for your R object *sleepapnea*.
@@ -200,17 +203,23 @@ sleepapnea_clean <- sleepapnea
 save(sleepapnea_clean, file="sleepapnea_clean.Rdata")
 ```
 
+Or you can also write the resulting data.frame into a new CSV file that you will be able to open with other software such as Excel.
+
+```{r writedata, exercise = TRUE, exercise.eval = FALSE}
+write(sleepapnea_clean, file="sleepapnea_clean.csv")
+```
+
 ## Part B - Descriptive Analysis
 
-### 1. Load your clean data set
+### 1. Load or read your clean data set
 
-```{r loadcache, echo=FALSE}
-load("../../data/sleepapnea_clean.Rdata")
-```
+If you saved your data.frame in a *.Rdata file you can import the data in R using the `load` function:  
 
-```{r load, exercise = TRUE, exercise.eval = FALSE}
+```{r load, eval = FALSE}
 load("sleepapnea_clean.Rdata")
 ```
+
+Note: in this tutorial, the import is done automatically by the library
 
 ### 2. The summary() and table() functions
 
