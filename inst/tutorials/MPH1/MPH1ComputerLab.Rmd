@@ -66,7 +66,8 @@ Every R code chunk is link to a R engine and, when you hit the *Run code* button
 ```{r example, exercise = TRUE, exercise.eval = FALSE}
 ```
 
-For the examples, we invite you to run the code and for the exercises we invite you to go beyond the example by adding arguments or completing with other R functions.
+For the examples, we invite you to run the code and for the exercises we invite you to go beyond the example by adding arguments or completing with other R functions. 
+Disclaimer : There are a lot of R functions. As you get more familiar with R, you’ll begin to memorize basic functions - and Google is always there for the rest.
 
 [As companion websites, we invite you to look at:]{.underline}
 
@@ -98,7 +99,10 @@ Reading functions in *R* follows common rules with similar arguments. The most i
 
 The `read.csv()` function is a generic function to read tabulated data set. To store the output of the `read.csv()` function in a R object we use the assignment operator, `<-`. For example, here we name our object *sleepapnea*
 
-Click *Run Code* to give it a try:
+To give it a try, do one of the following:
+
+- Place the cursor on the desired line, hold the *control* key, and press enter. On macOS, hold *command* key and press return instead;
+- Place the cursor on the desired line and click the *Run Code* button.
 
 ```{r read, exercise = TRUE, exercise.eval = FALSE, warnings=FALSE, message=FALSE}
 sleepapnea <- read.csv(file="https://github.com/nolwenn/MPHLabs/tree/main/data/SleepApnea.csv", header=TRUE, sep=",")
@@ -112,19 +116,26 @@ Run the command below to test the `head()` function:
 head(sleepapnea)
 ```
 
-Run the command in the code chunk below to test the `tail()` function
+Run the command in the code chunk below to test the `tail()` function:
 
 ```{r tail, exercise = TRUE, exercise.eval = FALSE}
 tail(sleepapnea)
 ```
 
-Try to modify the arguments of the `tail()` function to display the last 10 rows of your object (If you need help, use `?tail` in the code chunk)
+Try to modify the arguments of the `tail()` function to display the last 10 rows of your object (If you need help, use `?tail` in the code chunk):
 
 ```{r tailn10, exercise = TRUE}
 ```
 
 ```{r tailn10-solution}
 tail(sleepapnea, n=10)
+```
+
+A final note : in R, variables, functions, and other objects have names. These names are case sensitive, so you must be careful when referencing an object by name or calling a function. We’ve been using the `head()` and `tail()` functions in the above examples, which begins with lower cases h and p, respectively.  There is no `Head()` and `Tail()` function:
+
+```{r caSe senSitiVity, exercise = TRUE, exercise.eval = FALSE}
+Head(sleepapnea)
+Tail(sleepapnea)
 ```
 
 **Good job!** You should now have a sense of :
@@ -135,13 +146,13 @@ tail(sleepapnea, n=10)
 
 ### 2. Data structure and variable types
 
-To Look at your data structure in the R console you can use the `str()` function.
+To look at your data structure in the R console you can use the `str()` function:
 
 ```{r str, exercise = TRUE, exercise.eval = FALSE}
 str(sleepapnea)
 ```
 
-Your data set is a `data.frame` which is a rectangular R data format where variables can be of different types (e.g. numeric, character, factor...)
+Your data set is a `data.frame` which is a rectangular R data format where variables can be of different types (e.g. numeric, character, factor...).
 
 **Looking at your object, is the output consistent with what you expected in terms of variables' types?**
 
@@ -151,13 +162,13 @@ Note: The output of `str()` is equivalent to the visual display of the blue dot 
 
 The *number* variable in the sleep apnea data set corresponds to the identifier of each patient. It should not be a numeric value but a character or factor (categorical variable).
 
-a.  First, we transform into character the *number* variable using the function `as.character()`. One way of doing is to overwrite the *number* variable by selecting the vector(variable) *number* in the data set using the `$` sign and applying the `as.character()`.
+a.  First, we transform into character the *number* variable using the function `as.character()`. One way of doing is to overwrite the *number* variable by selecting the vector(variable) *number* in the data set using the `$` sign and applying the `as.character()`:
 
 ```{r tocharacter, exercise = TRUE, exercise.eval = FALSE}
 sleepapnea$number <- as.character(sleepapnea$number)
 ```
 
-Similarly, the *gender* variable should be a factor (categorical variable) and not a character.
+Similarly, the *gender* variable should be a factor (categorical variable) and not a character: 
 
 b.  Second, we need to transform the *gender* variable using `factor()`
 
@@ -169,7 +180,7 @@ summary(sleepapnea$gender)
 
 Note that we propose to use the summary function before and after to assess the result of applying the function.
 
-c.  Similarly, we need to transform the *diabetes* variable (read as a numeric) into a categorical variable using the function `factor()` and setting the argument `labels=` to "No" and "Yes" to annotate the levels 0 and 1
+c.  Similarly, we need to transform the *diabetes* variable (read as a numeric) into a categorical variable using the function `factor()` and setting the argument `labels=` to "No" and "Yes" to annotate the levels 0 and 1:
 
 ```{r tofactorwithlabels, exercise = TRUE, exercise.eval = FALSE}
 summary(sleepapnea$diabetes)
@@ -178,7 +189,7 @@ sleepapnea$diabetes <- factor(sleepapnea$diabetes, levels = c(0,1),
 summary(sleepapnea$diabetes)
 ```
 
-d.  To practice, do the same with the *Trigly_4Classes* variable knowing that :
+d.  To practice, do the same with the *Trigly_4Classes* variable knowing that:
 
 -   classe 1 is $< 1.50$ or Normal rate
 -   classe 2 is $1.50-1.99$ or Borderline rate
@@ -194,16 +205,18 @@ sleepapnea$Triglyceride_Cl_Ref <- factor(sleepapnea$Triglyceride_Cl_Ref, levels 
                                        "High", "Very High"))
 ```
 
+Caution : Every time you define a new variable or object with the same name as the original one, R forgets the old value. Therefore you should reuse variable or object names with caution, because it can become difficult to remember what the latest value was or you may need to correct a mistake made when categorizing a continuous variable! As for the *triglyceride* variable, try to have specific names for each new variable you create!
+
 ### 4. Save the clean data set
 
-To keep the results of your pre-processing and data management steps, it is recommended that you use the `save()` function to create a *Rdata file* that contains the clean version of your data set.
+To keep the results of your pre-processing and data management steps, it is recommended that you use the `save()` function to create a *Rdata file* that contains the clean version of your data set:
 
 ```{r save, exercise = TRUE, exercise.eval = FALSE}
 sleepapnea_clean <- sleepapnea
 save(sleepapnea_clean, file="sleepapnea_clean.Rdata")
 ```
 
-Or you can also write the resulting data.frame into a new CSV file that you will be able to open with other software such as Excel.
+Or you can also write the resulting data.frame into a new CSV file that you will be able to open with other software such as Excel:
 
 ```{r writedata, exercise = TRUE, exercise.eval = FALSE}
 write(sleepapnea_clean, file="sleepapnea_clean.csv")
@@ -219,11 +232,11 @@ If you saved your data.frame in a *.Rdata file you can import the data in R usin
 load("sleepapnea_clean.Rdata")
 ```
 
-Note: in this tutorial, the import is done automatically by the library
+Note: in this tutorial, the import is done automatically by the library.
 
 ### 2. The summary() and table() functions
 
-a.  Describe the variable gender using the functions `summary()` and `table()`
+a.  Describe the variable gender using the functions `summary()` and `table()`:
 
 ```{r gendersummary, exercise = TRUE}
 ```
@@ -233,7 +246,7 @@ summary(sleepapnea_clean$gender)
 table(sleepapnea_clean$gender)
 ```
 
-b.  Compute contingency table between *gender* and *diabetes* using the function `table()`
+b.  Compute contingency table between *gender* and *diabetes* using the function `table()`:
 
 ```{r gender2diabetes, exercise = TRUE}
 ```
@@ -242,16 +255,17 @@ b.  Compute contingency table between *gender* and *diabetes* using the function
 table("gender"=sleepapnea_clean$gender, "diabetes"=sleepapnea_clean$diabetes)
 ```
 
-Using `prop.table()` to compute the proportion of diabetes among female and male
+Using `prop.table()` to compute the proportion of diabetes among female and male:
 
 ```{r propgender2diabetes, exercise = TRUE}
 ```
 
 ```{r propgender2diabetes-solution}
 round(prop.table(table("gender"=sleepapnea_clean$gender, "diabetes"=sleepapnea_clean$diabetes), margin=1)*100, 2)
+#Of note, "margin=2" will provide you with the proportion of females and males among those with and without diabetes
 ```
 
-c.  Describe the variable age using the function `summary()`
+c.  Describe the variable age using the function `summary()`:
 
 ```{r agesummary, exercise = TRUE}
 ```
@@ -260,7 +274,7 @@ c.  Describe the variable age using the function `summary()`
 summary(sleepapnea_clean$age)
 ```
 
-d.  Compute the mean, standard deviation, mediane, quartiles for the variable age
+d.  Compute the mean, standard deviation, mediane, quartiles for the variable age:
 
 ```{r agedesc, exercise = TRUE}
 ```
@@ -275,11 +289,11 @@ quantile(sleepapnea_clean$age, probs= c(0, 0.3, 0.6), na.rm=TRUE)
 
 e.  What is the best graph for the variable age?
 
-```{r agehistogram}
+```{r agehistogram, exercise = TRUE, exercise.eval = FALSE}
 hist(sleepapnea_clean$age, main="distribution of age", xlab="age (years)")
 ```
 
-Draw the age distribution using the hist() function. Choose a width of age class of 2 years and of 5 years. Discuss about the shape of the two distributions.
+Draw the age distribution using the hist() function. Choose a width of age class of 2 years and of 5 years. Discuss about the shape of the two distributions:
 
 ```{r agehist2, exercise = TRUE}
 ```
@@ -289,9 +303,9 @@ hist(sleepapnea_clean$age, width=2, main="distribution of age", xlab="age (years
 hist(sleepapnea_clean$age, width=5, main="distribution of age", xlab="age (years)")
 ```
 
-f.  The `boxplot()` function summarize the quantile parameters for a quantitative variable. Below if the boxplot for the *age* variable. Interpret it.
+f.  The `boxplot()` function summarize the quantile parameters for a quantitative variable. Below if the boxplot for the *age* variable. Interpret it:
 
-```{r ageboxplot}
+```{r ageboxplot,  exercise = TRUE, exercise.eval = FALSE}
 boxplot(sleepapnea_clean$age, main="distribution of age", xlab="age (years)")
 ```
 
@@ -324,14 +338,14 @@ Note: The *epiDisplay* library propose the `ci()` function that computes the con
 
 Is there an association between sleep apnea and body mass index (bmi) status?
 
-a.  First, we need to create the bmi groups. We propose you to `cut()` the bmi (quantitative) variable into 2 groups: $<25$ for "normal" and $>25$ for "overweight"
+a.  First, we need to create the bmi groups. We propose you to `cut()` the bmi (quantitative) variable into 2 groups: $<25$ for "normal" and $>25$ for "overweight":
 
 ```{r cut, exercise = TRUE, exercise.eval = FALSE}
 sleepapnea_clean$bmi_2grp <- cut(sleepapnea_clean$bmi, c(0, 25, 55), include.lowest = TRUE, right=FALSE)
 levels(sleepapnea_clean$bmi_2grp) <- c("normal", "overweight")
 ```
 
-**Practice:** We propose you to `cut()` the bmi (quantitative) variable into 3 groups: $<25$ for "normal", $[25 to 30[$ for "overweight", and $>30$ for "obese"
+**Practice:** We propose you to `cut()` the bmi (quantitative) variable into 3 groups: $<25$ for "normal", $[25 to 30[$ for "overweight", and $>30$ for "obese":
 
 ```{r, bmi3grp, exercise = TRUE}
 ```
@@ -341,14 +355,16 @@ sleepapnea_clean$bmi_3grp <- cut(sleepapnea_clean$bmi, c(0, 25, 30, 55), include
 levels(sleepapnea_clean$bmi_3grp) <- c("normal", "overweight", "obese")
 ```
 
-b.  Second, we want to summarize the average of sleep apnea level by the 2 groups of bmi.
+b.  Second, we want to summarize the average of sleep apnea level by the 2 groups of bmi:
 
 ```{r meanbygroup, exercise = TRUE, exercise.eval = FALSE}
 library(dplyr)
 sleepapnea_clean %>% group_by(bmi_2grp) %>% summarise("mean_apnea"=mean(SleepApnea, na.rm = TRUE))
 ```
 
-**Practice:** Repeat the computation for the bmi in 3 groups
+Note : The pipe operator (%>%) in R is used to “pipe” together a sequence of operations. It is most commonly used with the dplyr package in R to perform a sequence of operations on a data frame. The basic syntax for the pipe operator is: df %>% do_this_operation %>% then_do_this_operation %>% then_do_this_operation.... The keyboard shortcut for the pipe operator is CTRL+SHIFT+M. 
+
+**Practice:** Repeat the computation for the bmi in 3 groups:
 
 ```{r, meanbygroup3, exercise = TRUE}
 ```
@@ -357,11 +373,33 @@ sleepapnea_clean %>% group_by(bmi_2grp) %>% summarise("mean_apnea"=mean(SleepApn
 sleepapnea_clean %>% group_by(bmi_3grp) %>% summarise("mean_apnea"=mean(SleepApnea, na.rm = TRUE))
 ```
 
-**Practice:** Try with other quatitative variables of the data set such as age, height or weight which could be some confounding factors
+**Practice:** Try with other quatitative variables of the data set such as age, height or weight which could be some confounding factors.  Of note, a confounding variable is a third variable that influences, or “confounds,” the relationship between an independent and a dependent variable by suggesting the presence of a spurious correlation.
 
 ### 2. Statistical tests of association
 
-**Example 1:** We would like to compare of the mean of sleep apnea among the 2 groups of bmi. What statistical tests to choose? What are the assumptions?
+**Example 1:** We would like to compare of the mean of sleep apnea among the 2 groups of bmi. 
+
+```{r quiz, echo=FALSE}
+quiz(caption = "Quiz",
+question("What statistical tests could be of relevance? (select the two correct options)",
+  answer("T-test", correct = TRUE),
+  answer("ANOVA"),
+  answer("Fisher test"),
+  answer("Wilcoxon test", correct = TRUE),
+  incorrect = "Incorrect. Give it another try.", 
+  random_answer_order = TRUE,
+  post_message = "Perfection! You got it. We have then two options: let's say, we go for the T-test option."
+),
+question("What are the assumptions to be checked if the t-test was to be chosen? (select the two correct options)",
+  answer("Normality", correct = TRUE),
+  answer("Expected frequencies are lower than 5"),
+  answer("Expected frequencies are higher than 5"),
+  answer("Equal variance", correct = TRUE),
+  incorrect = "Are you sure ? Give it another try!",
+  random_answer_order = TRUE
+)
+)
+```
 
 a.  Since we consider the mean we suppose that we have normally distributed values of sleep apnea in the 2 bmi groups. Let's verify using the classical Shapiro test:
 
@@ -371,7 +409,7 @@ by(sleepapnea_clean$SleepApnea, sleepapnea_clean$bmi_2grp, shapiro.test)
 
 What are your conclusions?
 
-b.  Given the result of the Shapiro test, we choose to use the non-parametric test `wilcox.text()` to assess for a potential association. Try to apply the test and interpret the results.
+b.  Given the result of the Shapiro test, we choose to use the non-parametric test `wilcox.test()` to assess for a potential association. Try to apply the test and interpret the results:
 
 ```{r wilcox, exercise = TRUE, exercise.eval = FALSE}
 wilcox.test(SleepApnea ~ bmi_2grp, data= sleepapnea_clean)
@@ -379,18 +417,21 @@ wilcox.test(SleepApnea ~ bmi_2grp, data= sleepapnea_clean)
 
 Note: For most statistical tests of association, the *R* syntax is of type formula i.e. `func(y ~ x, data=mydata)` but you might want to look at the help pages of the different test functions for the details of their usage.
 
-c.  Given the result of the Shapiro test, we can try to transform the sleep apnea measures into a logarithm scale to approach a Normal distribution and use the parametric Student T test using `t.test()`. What is your interpretation?
+c.  Given the result of the Shapiro test, we can also try to transform the sleep apnea measures into a logarithm scale to approach a Normal distribution and use the parametric Student T test using `t.test()`. What is your interpretation?
 
 ```{r apnealog,  exercise = TRUE}
 
 ```
 
-```{r apnealog-solution, exercise = TRUE, exercise.eval = FALSE}
+```{r apnealog-solution, exercise = TRUE}
 sleepapnea_clean$SleepApnea_log <- log(SleepApnea)
+by(sleepapnea_clean$SleepApnea_log, sleepapnea_clean$bmi_2grp, shapiro.test) #check that the new created variable is normally distributed
 t.test(SleepApnea_log ~ bmi_2grp, data=sleepapnea_clean)
 ```
 
-**Example 2:** We would like to compare of the distribution of sleep apnea measures among the 3 groups of bmi. Given the repartition of the patients among the 3 groups of bmi, we propose to use the `kruskal.test()` non-parametric rank sum test to assess the differences (or not) between groups.
+To sum up : Transforming data to normal distribution is a method of changing the distribution by applying a mathematical function to each data value. This can help to achieve normality in modeling problems. Depending on the actual variable distribution, some common functions are logartithm and square root transformations, adding, subtracting, multiplying, but also dividing. Other options are to use the Box-Cox or Yeo-Johnson transforms. There are times when it's not possible to transform your data, and in such cases you need to use non-parametric tests.
+
+**Example 2:** We would like to compare the distribution of sleep apnea measures among the 3 groups of bmi. Given the repartition of the patients among the 3 groups of bmi, we propose to use the `kruskal.test()` non-parametric rank sum test to assess the differences (or not) between groups:
 
 ```{r kruskal, exercise = TRUE, exercise.eval = FALSE}
 kruskal.test(SleepApnea ~ bmi_3grp, data= sleepapnea_clean)
@@ -407,13 +448,13 @@ dunn_test(SleepApnea ~ bmi_3grp, data= sleepapnea_clean)
 
 **Example 3:** We would like to test whether there is an association between gender and bmi groups. What statistical tests to choose? What are the assumptions?
 
-a.  We consider the gender and bmi groups which are categorical variables. We can perform a Fisher Exact test using `fisher.test()`
+a.  We consider the gender and bmi groups which are categorical variables. We can perform a Fisher Exact test using `fisher.test()`:
 
-```{r fisher}
+```{r fisher, exercise = TRUE, exercise.eval = FALSE}
 fisher.test(sleepapnea_clean$gender, sleepapnea_clean$bmi_2grp)
 ```
 
-b.  A similar test is the Chi Square test that you can apply using `chisq.test()`. Have a try and interpret the results.
+b.  A similar test is the Chi Square test that you can apply using `chisq.test()`. Have a try and interpret the results:
 
 ```{r chi2, exercise = TRUE}
 
@@ -422,3 +463,18 @@ b.  A similar test is the Chi Square test that you can apply using `chisq.test()
 ```{r chi2-solution, exercise = TRUE}
 chisq.test(sleepapnea_clean$gender, sleepapnea_clean$bmi_2grp)
 ```
+To wrap up
+
+The hypotheses of the Fisher’s exact test are the same than for the Chi-square test, that is:
+
+H0 : the variables are independent, there is no relationship between the two categorical variables. Knowing the value of one variable does not help to predict the value of the other variable.
+H1: the variables are dependent, there is a relationship between the two categorical variables. Knowing the value of one variable helps to predict the value of the other variable.
+
+Remember that the Fisher’s exact test is used when there is at least one cell in the contingency table of the expected frequencies below 5. To retrieve the expected frequencies, use the chisq.test() function together with $expected:
+
+```{r chisq-expected, exercise = TRUE, exercise.eval = FALSE}
+
+chisq.test(sleepapnea_clean$gender, sleepapnea_clean$bmi_2grp)$expected
+
+```
+Tip: although it is a good practice to check the expected frequencies before deciding between the Chi-square and the Fisher test, it is not a big issue if you forget. As you can see above, when doing the Chi-square test in R (with chisq.test()), a warning such as “Chi-squared approximation may be incorrect” will appear. This warning means that the smallest expected frequencies is lower than 5. Therefore, do not worry if you forgot to check the expected frequencies before applying the appropriate test to your data, R will warn you that you should use the Fisher’s exact test instead of the Chi-square test if that is the case.
