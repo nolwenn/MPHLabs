@@ -131,9 +131,9 @@ Try to modify the arguments of the `tail()` function to display the last 10 rows
 tail(sleepapnea, n=10)
 ```
 
-A final note : in R, variables, functions, and other objects have names. These names are case sensitive, so you must be careful when referencing an object by name or calling a function. We’ve been using the `head()` and `tail()` functions in the above examples, which begins with lower cases h and p, respectively.  There is no `Head()` and `Tail()` function:
+A final note : in R, variables, functions, and other objects have names. These names are case sensitive, so you must be careful when referencing an object by name or calling a function. We’ve been using the `head()` and `tail()` functions in the above examples, which begins with lower cases h and t, respectively.  There is no `Head()` and `Tail()` function:
 
-```{r caSe senSitiVity, exercise = TRUE, exercise.eval = FALSE}
+```{r case_sensitivity, exercise = TRUE, exercise.eval = FALSE}
 Head(sleepapnea)
 Tail(sleepapnea)
 ```
