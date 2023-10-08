@@ -105,7 +105,7 @@ To give it a try, do one of the following:
 - Place the cursor on the desired line and click the *Run Code* button.
 
 ```{r read, exercise = TRUE, exercise.eval = FALSE, warnings=FALSE, message=FALSE}
-sleepapnea <- read.csv(file="https://github.com/nolwenn/MPHLabs/tree/main/data/SleepApnea.csv", header=TRUE, sep=",")
+sleepapnea <- read.csv(file="https://raw.githubusercontent.com/nolwenn/MPHLabs/main/data/SleepApnea.csv", header=TRUE, sep=",")
 ```
 
 For a quick verification of the reading output, you can use `head()` or `tail()` to observe the first 6 or last 6 rows for your R object *sleepapnea*.
