@@ -189,18 +189,18 @@ sleepapnea$diabetes <- factor(sleepapnea$diabetes, levels = c(0,1),
 summary(sleepapnea$diabetes)
 ```
 
-d.  To practice, create the *Triglyceride_Cl_Ref* variable using the existing *Trigly_4Classes* variable and knowing that:
+d.  To practice, rename the *Triglyceride_Cl_Ref* modalities using the existing *Triglyceride_Cl_Ref* variable knowing that:
 
--   classe 1 is $< 1.50$ or Normal rate
--   classe 2 is $1.50-1.99$ or Borderline rate
--   classe 3 is $2.00-4.99$ or High rate
--   classe 4 is $> 5.00$ or Very high rate
+-   classe 0 is $< 1.50$ or Normal rate
+-   classe 1 is $1.50-1.99$ or Borderline rate
+-   classe 2 is $2.00-4.99$ or High rate
+-   classe 3 is $> 5.00$ or Very high rate
 
 ```{r TriglycerideCl, exercise = TRUE}
 ```
 
 ```{r TriglycerideCl-solution}
-sleepapnea$Triglyceride_Cl_Ref <- factor(sleepapnea$Trigly_4Classes, levels = c(1:4),
+sleepapnea$Triglyceride_Cl_Ref <- factor(sleepapnea$Triglyceride_Cl_Ref, levels = c(0:3),
                               labels=c("Normal","Bordeline",
                                        "High", "Very High"))
 summary(sleepapnea$Triglyceride_Cl_Ref)
@@ -337,8 +337,6 @@ Note: The *epiDisplay* library propose the `ci()` function that computes the con
 
 ### 1. Summary by strata (group)
 
-Is there an association between sleep apnea and body mass index (bmi) status?
-
 a.  First, we need to create the bmi groups. We propose you to `cut()` the bmi (quantitative) variable into 2 groups: $<25$ for "normal" and $>25$ for "overweight":
 
 ```{r cut, exercise = TRUE, exercise.eval = FALSE}
@@ -381,8 +379,7 @@ sleepapnea_clean %>% group_by(bmi_3grp) %>% summarise("mean_apnea"=mean(SleepApn
 **Example 1:** We would like to compare of the mean of sleep apnea among the 2 groups of bmi. 
 
 ```{r quiz, echo=FALSE}
-quiz(caption = "Quiz",
-question("What statistical tests could be of relevance? (select the two correct options)",
+quiz(question("What statistical tests could be of relevance? (select the two correct options)",
   answer("T-test", correct = TRUE),
   answer("ANOVA"),
   answer("Fisher test"),
@@ -485,7 +482,7 @@ Tip: although it is a good practice to check the expected frequencies before dec
 
 ### 1. Is there an association between sleep apnea and cholesterol classes ?
 
-a. Define a new categorical variable ("Cholesterol_tert") using the tertiles of the distribution of the "cholesterol" variable.
+a. Define a new categorical variable (*Cholesterol_tert*) using the tertiles of the distribution of the *cholesterol* variable.
 
 ```{r CholesterolClassesSleepApnea, exercise = TRUE}
 
@@ -496,12 +493,12 @@ a. Define a new categorical variable ("Cholesterol_tert") using the tertiles of 
 where2break <- quantile(sleepapnea_clean$cholesterol, c(0:3/3))
 sleepapnea_clean$Cholesterol_tert<- cut(sleepapnea_clean$cholesterol,breaks = where2break, 
                                include.lowest = TRUE,right=FALSE)
-table(sleepapnea_clean$Cholesterol_tert)
+table(sleepapnea_clean$Cholesterol_tert) #to check the distribution of your new variable
 
 ```
 
 
-b. Plot the distribution of the SleepApnea variable by group of "Cholesterol_tert".
+b. Plot the distribution of the *SleepApnea* variable by group of *Cholesterol_tert*.
 
 ```{r CholesterolClassesSleepApneaPlot, exercise = TRUE}
 
@@ -511,7 +508,7 @@ b. Plot the distribution of the SleepApnea variable by group of "Cholesterol_ter
 boxplot(sleepapnea_clean$SleepApnea ~  sleepapnea_clean$Cholesterol_tert,  main="Distribution of SleepApnea by concentration of cholesterol", ylab="Sleep Apnea (number of pauses of breathing)", xlab="Concentration of cholesterol (tertiles)")
 
 ```
-c. Formulate the statistical hypotheses to compare SleepApnea variable by cholesterol group.
+c. Formulate the statistical hypotheses to compare *SleepApnea* variable by cholesterol group.
 
 ```{r CholesterolClassesSleepApneaHypo, exercise = TRUE}
 
@@ -519,12 +516,26 @@ c. Formulate the statistical hypotheses to compare SleepApnea variable by choles
 
 ```{r CholesterolClassesSleepApneaHypo-solution}
 
-H0 :  The average number of pauses of breathing are the same in each group
-H1 :  The average number of pauses of breathing differ in at least one case compare to the others
+#H0 :  The average number of pauses of breathing are the same in each group
+#H1 :  The average number of pauses of breathing differ in at least one case compare to the others
 
 ```
 
-d. Test for the normality of the distribution of SleepApnea variable by group of "Cholesterol_tert".
+d. Test for the normality of the distribution of *SleepApnea* variable by group of *Cholesterol_tert*.
+
+
+```{r quiz2, echo=FALSE}
+quiz(question("For this test, what is the H0 hypothesis? (select the correct answer)",
+  answer("The distribution of the "SleepApnea" variable in the different groups of cholesterol concentration is not different from a Normal distribution", correct = TRUE),
+  answer("The distribution of the "SleepApnea" variable in the different groups of cholesterol concentration is different from a Normal distribution"),
+  answer("The distribution of the "SleepApnea" variable is different from a Normal distribution"),
+  answer("None of the above"),
+  incorrect = "Incorrect. Give it another try.", 
+  random_answer_order = TRUE,
+  post_message = "Alright! You got it. Now, let's run the test and interpret the result."
+)
+)
+```
 
 ```{r CholesterolClassesSleepApneaNormality, exercise = TRUE}
 
@@ -543,16 +554,25 @@ e. According to your previous findings, use the appropriate function and associa
 
 ```{r CholesterolClassesSleepApneaKruskal-solution}
 
-res_kruskal = kruskal.test(formula = SleepApnea ~ Cholesterol_tert, data = sleepapnea_clean)
-summary(res_kruskal)
+#We rejected H0
+kruskal.test(formula = SleepApnea ~ Cholesterol_tert, data = sleepapnea_clean)
 
 library(rstatix)
 dunn_test(formula = SleepApnea ~ Cholesterol_tert, data = sleepapnea_clean)
 
 
 ```
+f. Another option would be to use the *SleepApnea_log* variable. Re-run the analysis with this variable.
 
-f. Was the categorization of the "cholesterol" variable necessary ? Justify with a plot.
+```{r CholesterolClassesSleepApnealog, exercise = TRUE}
+
+```
+
+```{r CholesterolClassesSleepApnealog-solution}
+
+```
+
+g. Was the categorization of the *cholesterol* variable necessary ? Justify with a plot.
 
 ```{r CholesterolClassesSleepApneaCat, exercise = TRUE}
 
@@ -568,7 +588,7 @@ hist(sleepapnea_clean$cholesterol)
 
 ### 2. Is there an association between sleep apnea and triglyceride classes ?
 
-a. Define a new categorical variable ("Triglyceride_tert") using the tertiles of the distribution of the "Triglyceride" variable.
+a. Define a new categorical variable (*Triglyceride_tert*) using the tertiles of the distribution of the *Triglyceride* variable.
 
 ```{r TriglycerideClassesSleepApnea, exercise = TRUE}
 
@@ -584,7 +604,7 @@ table(sleepapnea_clean$Triglyceride_tert)
 ```
 
 
-b. Plot the distribution of the SleepApnea variable by group of "Triglyceride_tert".
+b. Plot the distribution of the "SleepApnea" variable by group of *Triglyceride_tert*.
 
 ```{r TriglycerideClassesSleepApneaPlot, exercise = TRUE}
 
@@ -594,7 +614,7 @@ b. Plot the distribution of the SleepApnea variable by group of "Triglyceride_te
 boxplot(sleepapnea_clean$SleepApnea ~  sleepapnea_clean$Triglyceride_tert,  main="Distribution of SleepApnea by concentration of triglyceride", ylab="Sleep Apnea (number of pauses of breathing)", xlab="Concentration of triglyceride (tertiles)")
 
 ```
-c. Formulate the statistical hypotheses to compare SleepApnea variable by triglyceride group.
+c. Formulate the statistical hypotheses to compare "SleepApnea" variable by triglyceride group.
 
 ```{r TriglycerideClassesSleepApneaHypo, exercise = TRUE}
 
@@ -602,12 +622,12 @@ c. Formulate the statistical hypotheses to compare SleepApnea variable by trigly
 
 ```{r TriglycerideClassesSleepApneaHypo-solution}
 
-H0 :  The average number of pauses of breathing are the same in each group
-H1 :  The average number of pauses of breathing differ in at least one case compare to the others
+#H0 :  The average number of pauses of breathing are the same in each group
+#H1 :  The average number of pauses of breathing differ in at least one case compare to the others
 
 ```
 
-d. Test for the normality of the distribution of SleepApnea variable by group of "Triglyceride_tert".
+d. Test for the normality of the distribution of *SleepApnea* variable by group of *Triglyceride_tert*.
 
 ```{r TriglycerideClassesSleepApneaNormality, exercise = TRUE}
 
@@ -627,8 +647,7 @@ e. According to the previous findings, use the appropriate function and associat
 
 ```{r TriglycerideClassesSleepApneaKruskal-solution}
 
-res_kruskal = kruskal.test(formula = SleepApnea ~ Triglyceride_tert, data = sleepapnea_clean)
-summary(res_kruskal)
+kruskal.test(formula = SleepApnea ~ Triglyceride_tert, data = sleepapnea_clean)
 
 library(rstatix)
 dunn_test(formula = SleepApnea ~ Triglyceride_tert, data = sleepapnea_clean)
@@ -636,7 +655,7 @@ dunn_test(formula = SleepApnea ~ Triglyceride_tert, data = sleepapnea_clean)
 
 ```
 
-f. Try to repeat the steps from b to e with the "Triglyceride_Cl_Ref" variable.
+f. Try to repeat the steps from b to e with the *Triglyceride_Cl_Ref* variable.
 
 ```{r TriglycerideClassesSleepApneaKruskal2, exercise = TRUE}
 
@@ -647,14 +666,14 @@ f. Try to repeat the steps from b to e with the "Triglyceride_Cl_Ref" variable.
 boxplot(sleepapnea_clean$SleepApnea ~  sleepapnea_clean$Triglyceride_Cl_Ref,  main="Distribution of SleepApnea by concentration of triglyceride", ylab="Sleep Apnea (number of pauses of breathing)", xlab="Concentration of triglyceride (biological cut-off)")
 
 #Hypothesis
-H0 :  The average number of pauses of breathing are the same in each group
-H1 :  The average number of pauses of breathing differ in at least one case compare to the others
+#H0 :  The average number of pauses of breathing are the same in each group
+#H1 :  The average number of pauses of breathing differ in at least one case compare to the others
 
 #Normality check
 by(sleepapnea_clean$SleepApnea, sleepapnea_clean$Triglyceride_Cl_Ref, shapiro.test)
 #An error message appears following this code line
-#This is because few people (2) are considered as "very high" with regards to theri triglyceride concentration  
-#Which make it impossible to conduct the test
+#This is because few people (only 2) are considered as "very high" with regards to the triglyceride concentration  
+#Which makes it impossible to conduct the test
 
 #Creation of a new variable with 3 modalities
 sleepapnea_clean$Triglyceride_Cl_Ref_bis <- ifelse(sleepapnea_clean$Triglyceride_Cl_Ref %in% c("Normal"), "Normal", 
@@ -664,11 +683,14 @@ sleepapnea_clean$Triglyceride_Cl_Ref_bis <- ifelse(sleepapnea_clean$Triglyceride
 table(sleepapnea_clean$Triglyceride_Cl_Ref_bis)
 
 #Test 
-#To complete after correction
+kruskal.test(formula = SleepApnea ~ Triglyceride_Cl_Ref_bis, data = sleepapnea_clean)
+
+library(rstatix)
+dunn_test(formula = SleepApnea ~ Triglyceride_Cl_Ref_bis, data = sleepapnea_clean)
 
 ```
 
-g. Compare the results when using the "Triglyceride_tert" variable and the "Triglyceride_Cl_Ref" variable. What are your conclusions ?
+g. Compare the results when using the *Triglyceride_tert* variable and the *Triglyceride_Cl_Ref* variable. What are your conclusions ?
 
 ### 3. Is having more comorbities associated with sleep apnea ?
 
@@ -688,7 +710,7 @@ sleepapnea_clean$CardiacFreq_high <- ifelse(sleepapnea_clean$CardiacFreq <= 85, 
 
 ```
 
-b. Create a score ranging from 0 to 3 corresponding to the sum of comorbidities then create a factor variable (named "bad_shape"). Check the distribution of this new variable and make the appropriate changes if needed.
+b. Create a score ranging from 0 to 3 corresponding to the sum of comorbidities then create a factor variable (named *bad_shape*). Check the distribution of this new variable and make the appropriate changes if needed.
 
 ```{r ComorbiditiesSleepApneaSum, exercise = TRUE}
 
@@ -712,7 +734,7 @@ table(sleepapnea_clean$bad_shape)
 
 ```
 
-c. Conduct the appropriate test to investigate the association between the "SleepApnea" and the newly created variable "bad_shape".
+c. Conduct the appropriate test to investigate the association between the *SleepApnea* and the newly created variable *bad_shape*.
 
 ```{r ComorbiditiesSleepApneaTest, exercise = TRUE}
 
@@ -724,15 +746,14 @@ c. Conduct the appropriate test to investigate the association between the "Slee
 by(sleepapnea_clean$SleepApnea, sleepapnea_clean$bad_shape, shapiro.test)
 
 #Test
-res_kruskal = kruskal.test(formula = SleepApnea ~ bad_shape, data = sleepapnea_clean)
-summary(res_kruskal)
+kruskal.test(formula = SleepApnea ~ bad_shape, data = sleepapnea_clean)
 
 library(rstatix)
 dunn_test(formula = SleepApnea ~ bad_shape, data = sleepapnea_clean)
 
 ```
 
-d. Repeat the analysis (with the appropriate test) by considering the "SleepApnea" variable as a dichotomous one (cut-off : 70 pauses of breathing). 
+d. Repeat the analysis (with the appropriate test) by considering the *SleepApnea* variable as a dichotomous one (cut-off : 70 pauses of breathing). 
 
 ```{r ComorbiditiesSleepApneaTest2, exercise = TRUE}
 
@@ -740,4 +761,214 @@ d. Repeat the analysis (with the appropriate test) by considering the "SleepApne
 
 ```{r ComorbiditiesSleepApneaTest2-solution}
 
+#Create the dichotomous variable
+sleepapnea_clean$SleepApnea_grp <-  ifelse(sleepapnea_clean$SleepApnea < 70, "normal", "high") 
+
+#Hypothesis
+# H0: Equal distribution of people with ou without comorbidities among the high and normal sleep apnea
+# H1: Different distribution
+
+#Distribution
+round(prop.table(xtabs( ~ bad_shape + SleepApnea_grp, data = sleepapnea_clean), 2)*100,2)
+#Among those with a normal number of pauses of breathing, around 67% has no comorbidity against only around 28% among #those with a higher number of pauses of breathing
+
+#Test
+fisher.test(sleepapnea_clean$bad_shape, sleepapnea_clean$SleepApnea_grp)
+
 ```
+
+## Part E - Linear regression analysis
+
+### Is there a linear association between sleep apnea and bmi?
+
+a. Which variable is the dependent variable ? Which variable is the independent variable?
+
+```{r SleepApneaBmi, exercise = TRUE}
+
+```
+
+```{r SleepApneaBmi-solution}
+
+#The "SleepApnea" variable is the dependent variable
+#The "bmi" variable is the independent variable
+
+```
+
+The "SleepApnea" variable is somehow skewed, so we prefer to use its log transformed version (created before) to assess any linear association.
+
+b. Represent and comment on the relationship between *SleepApnea_log* and *bmi* using the ggplot() function (?ggplot).
+
+```{r SleepApnealogBmiGraph, exercise = TRUE}
+
+```
+
+```{r SleepApnealogBmiGraph-solution}
+ggplot(sleepapnea_clean, aes(bmi, SleepApnea_log)) + 
+  geom_point(color = "dark blue") +
+  geom_smooth(method = "lm", se=FALSE, color="red", 
+              formula = y ~ x)
+```
+
+c. What does the following warning mean : "Warning: Removed 1 rows containing non-finite values (`stat_smooth()`)." ?
+
+```{r SleepApnealogBmiWarning, exercise = TRUE}
+
+```
+
+```{r SleepApnealogBmiWarning-solution}
+
+#There is one missing value in the SleepApnea_log variable hence the fact that one "row" was removed 
+
+```
+
+d. Formulate the statistical hypotheses to test the linear association between *bmi* and *SleepApnea_log*.
+
+```{r SleepApnealogBmiHypo, exercise = TRUE}
+
+```
+
+```{r SleepApnealogBmiHypo-solution}
+
+#H0 : Beta1 = 0, bmi has no effect on sleep apnea  
+#H1 : Beta1 not equal to 0, changes in bmi are associated with changes in sleep apnea
+
+#or
+
+#H0: There is no linear association between sleepapnea and bmi
+#H1: There is a linear association between sleepapnea and bmi
+
+```
+
+e. Apply a simple linear regression model using the function called lm() and visually assess the quality of the linear regression using the plot() function.
+
+```{r SleepApnealogBmiReg, exercise = TRUE}
+
+```
+
+```{r SleepApnealogBmiReg-solution}
+
+model <- lm(SleepApnea_log ~ bmi, data = sleepapnea_clean)
+model
+summary(model)
+coefficients(model)          # Mean effects size
+confint(model, level = 0.95) # Compute confidence intervals
+
+layout(matrix(1:4, ncol=2))
+plot(model)
+layout(1)
+
+```
+
+f. Interpret the results
+
+```{r SleepApnealogBmiInt, exercise = TRUE}
+
+```
+
+```{r SleepApnealogBmiInt-solution}
+
+#For 1 unit increase in bmi, there is 0.029 increase in log(sleepapnea)
+
+```
+### Is there a linear association between sleep apnea and age? 
+
+Following the same steps as in the previous section, test the presence of a linear association between sleep apnea and age.
+
+```{r SleepApneaAge, exercise = TRUE}
+
+```
+
+```{r SleepApneaAge-solution}
+
+#The "SleepApnea" variable is the dependent variable
+#The "age" variable is the independent variable
+
+#Represent and comment on the relationship between *SleepApnea_log* and *age* using the ggplot() function.
+
+ggplot(sleepapnea_clean, aes(age, SleepApnea_log)) + 
+  geom_point(color = "dark blue") +
+  geom_smooth(method = "lm", se=FALSE, color="red", 
+              formula = y ~ x)
+
+#Formulate the statistical hypotheses to test the linear association between *age* and *SleepApnea_log*.
+
+#H0 : Beta1 = 0, age has no effect on sleep apnea  
+#H1 : Beta1 not equal to 0, changes in age are associated with changes in sleep apnea
+#or
+#H0: There is no linear association between sleepapnea and age
+#H1: There is a linear association between sleepapnea and age
+
+
+#Apply a simple linear regression model using the function called lm() and visually assess the quality of the linear #regression using the plot() function.
+
+model <- lm(SleepApnea_log ~ age, data = sleepapnea_clean)
+model
+summary(model)
+coefficients(model)          # Mean effects size
+confint(model, level = 0.95) # Compute confidence intervals
+
+layout(matrix(1:4, ncol=2))
+plot(model)
+layout(1)
+
+#Interpret the results
+#There is no association between age and log(sleepapnea)
+
+```
+
+### Is there a linear association between sleep apnea and cardiac frequency ? 
+
+Following the same steps as in the previous section test the presence of a linear association between sleep apnea and cardiac frequency.
+
+```{r SleepApneaCardiacFreq, exercise = TRUE}
+
+```
+
+```{r SleepApneaCardiacFreq-solution}
+
+#The "SleepApnea" variable is the dependent variable
+#The "CardiacFreq" variable is the independent variable
+
+#Represent and comment on the relationship between *SleepApnea_log* and *CardiacFreq* using the ggplot() function.
+
+ggplot(sleepapnea_clean, aes(CardiacFreq, SleepApnea_log)) + 
+  geom_point(color = "dark blue") +
+  geom_smooth(method = "lm", se=FALSE, color="red", 
+              formula = y ~ x)
+
+#Formulate the statistical hypotheses to test the linear association between *CardiacFreq* and *SleepApnea_log*.
+
+#H0 : Beta1 = 0, cardiac frequency has no effect on sleep apnea  
+#H1 : Beta1 not equal to 0, changes in cardiac frequency are associated with changes in sleep apnea
+#or
+#H0: There is no linear association between sleepapnea and cardiac frequency
+#H1: There is a linear association between sleepapnea and cardiac frequency
+
+
+#Apply a simple linear regression model using the function called lm() and visually assess the quality of the linear #regression using the plot() function.
+
+model <- lm(SleepApnea_log ~ CardiacFreq, data = sleepapnea_clean)
+model
+summary(model)
+coefficients(model)          # Mean effects size
+confint(model, level = 0.95) # Compute confidence intervals
+
+layout(matrix(1:4, ncol=2))
+plot(model)
+layout(1)
+
+#Interpret the results
+#For 1 unit increase in cardiac frequency, there is 0.009 increase in log(sleepapnea)
+
+```
+
+You have performed simple linear regression and see the limits. What do you think you should do next to assess the possible effect of the different risk factors?
+
+
+```{r SleepApneaLinearRegLimits, exercise = TRUE}
+
+```
+
+## Part F - Logistic regression analysis
+
+In progress
