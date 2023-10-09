@@ -29,11 +29,11 @@ options(tutorial.storage = list(
   # save an arbitrary R object "data" to storage
   save_object = function(tutorial_id, tutorial_version, user_id, object_id, data) {
   },
-  # retreive a single R object from storage
+  # retrieve a single R object from storage
   get_object = function(tutorial_id, tutorial_version, user_id, object_id) { 
     NULL 
   },
-  # retreive a list of all R objects stored
+  # retrieve a list of all R objects stored
   get_objects = function(tutorial_id, tutorial_version, user_id) { 
     list() 
   },
@@ -42,8 +42,8 @@ options(tutorial.storage = list(
   }))
   
 knitr::opts_chunk$set(error = TRUE, tutorial.data_dir="data")
-load("../../data/sleepapnea.Rdata")
-load("../../data/sleepapnea_clean.Rdata")
+load("../../../data/sleepapnea.Rdata")
+load("../../../data/sleepapnea_clean.Rdata")
 ```
 
 ## Welcome
@@ -189,7 +189,7 @@ sleepapnea$diabetes <- factor(sleepapnea$diabetes, levels = c(0,1),
 summary(sleepapnea$diabetes)
 ```
 
-d.  To practice, do the same with the *Trigly_4Classes* variable knowing that:
+d.  To practice, create the *Triglyceride_Cl_Ref* variable using the existing *Trigly_4Classes* variable and knowing that:
 
 -   classe 1 is $< 1.50$ or Normal rate
 -   classe 2 is $1.50-1.99$ or Borderline rate
@@ -200,9 +200,10 @@ d.  To practice, do the same with the *Trigly_4Classes* variable knowing that:
 ```
 
 ```{r TriglycerideCl-solution}
-sleepapnea$Triglyceride_Cl_Ref <- factor(sleepapnea$Triglyceride_Cl_Ref, levels = c(1:4),
+sleepapnea$Triglyceride_Cl_Ref <- factor(sleepapnea$Trigly_4Classes, levels = c(1:4),
                               labels=c("Normal","Bordeline",
                                        "High", "Very High"))
+summary(sleepapnea$Triglyceride_Cl_Ref)
 ```
 
 Caution : Every time you define a new variable or object with the same name as the original one, R forgets the old value. Therefore you should reuse variable or object names with caution, because it can become difficult to remember what the latest value was or you may need to correct a mistake made when categorizing a continuous variable! As for the *triglyceride* variable, try to have specific names for each new variable you create!
@@ -219,7 +220,7 @@ save(sleepapnea_clean, file="sleepapnea_clean.Rdata")
 Or you can also write the resulting data.frame into a new CSV file that you will be able to open with other software such as Excel:
 
 ```{r writedata, exercise = TRUE, exercise.eval = FALSE}
-write(sleepapnea_clean, file="sleepapnea_clean.csv")
+write.csv(sleepapnea_clean, file="sleepapnea_clean.csv")
 ```
 
 ## Part B - Descriptive Analysis
@@ -699,7 +700,7 @@ sleepapnea_clean$bad_shape <- rowSums(sleepapnea_clean[ , c("obese", "triglyceri
 table(sleepapnea_clean$bad_shape)
 # Transform into factor
 sleepapnea_clean$bad_shape <- factor(sleepapnea_clean$bad_shape, levels=c(0:3),
-                          labels=c("non", "1 comorbidity", "2 comorbidities", 
+                          labels=c("no", "1 comorbidity", "2 comorbidities", 
                                    "3 comorbidities"))
 table(sleepapnea_clean$bad_shape)
 # group level number 4 with number 3 since only 1 person in "3 comorbidities"
