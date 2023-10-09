@@ -42,8 +42,8 @@ options(tutorial.storage = list(
   }))
   
 knitr::opts_chunk$set(error = TRUE, tutorial.data_dir="data")
-load("../../../data/sleepapnea.Rdata")
-load("../../../data/sleepapnea_clean.Rdata")
+load("sleepapnea.Rdata")
+load("sleepapnea_clean.Rdata")
 ```
 
 ## Welcome
