@@ -244,7 +244,7 @@ a.  Describe the variable gender using the functions `summary()` and `table()`:
 
 ```{r gendersummary-solution}
 summary(sleepapnea_clean$gender)
-table(sleepapnea_clean$gender)
+table(sleepapnea_clean$gender, useNA = "always")
 ```
 
 b.  Compute contingency table between *gender* and *diabetes* using the function `table()`:
