@@ -350,7 +350,7 @@ levels(sleepapnea_clean$bmi_2grp) <- c("normal", "overweight")
 ```{r, bmi3grp, exercise = TRUE}
 ```
 
-```{r bmi3grp-solution, exercise = TRUE}
+```{r bmi3grp-solution}
 sleepapnea_clean$bmi_3grp <- cut(sleepapnea_clean$bmi, c(0, 25, 30, 55), include.lowest = TRUE, right=FALSE)
 levels(sleepapnea_clean$bmi_3grp) <- c("normal", "overweight", "obese")
 ```
@@ -369,7 +369,7 @@ Note : The pipe operator (%>%) in R is used to “pipe” together a sequence of
 ```{r, meanbygroup3, exercise = TRUE}
 ```
 
-```{r meanbygroup3-solution, exercise = TRUE}
+```{r meanbygroup3-solution}
 sleepapnea_clean %>% group_by(bmi_3grp) %>% summarise("mean_apnea"=mean(SleepApnea, na.rm = TRUE))
 ```
 
@@ -423,8 +423,8 @@ c.  Given the result of the Shapiro test, we can also try to transform the sleep
 
 ```
 
-```{r apnealog-solution, exercise = TRUE}
-sleepapnea_clean$SleepApnea_log <- log(SleepApnea)
+```{r apnealog-solution}
+sleepapnea_clean$SleepApnea_log <- log(sleepapnea_clean$SleepApnea)
 by(sleepapnea_clean$SleepApnea_log, sleepapnea_clean$bmi_2grp, shapiro.test) #check that the new created variable is normally distributed
 t.test(SleepApnea_log ~ bmi_2grp, data=sleepapnea_clean)
 ```
@@ -460,7 +460,7 @@ b.  A similar test is the Chi Square test that you can apply using `chisq.test()
 
 ```
 
-```{r chi2-solution, exercise = TRUE}
+```{r chi2-solution}
 chisq.test(sleepapnea_clean$gender, sleepapnea_clean$bmi_2grp)
 ```
 To wrap up
@@ -478,3 +478,265 @@ chisq.test(sleepapnea_clean$gender, sleepapnea_clean$bmi_2grp)$expected
 
 ```
 Tip: although it is a good practice to check the expected frequencies before deciding between the Chi-square and the Fisher test, it is not a big issue if you forget. As you can see above, when doing the Chi-square test in R (with chisq.test()), a warning such as “Chi-squared approximation may be incorrect” will appear. This warning means that the smallest expected frequencies is lower than 5. Therefore, do not worry if you forgot to check the expected frequencies before applying the appropriate test to your data, R will warn you that you should use the Fisher’s exact test instead of the Chi-square test if that is the case.
+
+
+## Part D - More univariate analysis
+
+### 1. Is there an association between sleep apnea and cholesterol classes ?
+
+a. Define a new categorical variable ("Cholesterol_tert") using the tertiles of the distribution of the "cholesterol" variable.
+
+```{r CholesterolClassesSleepApnea, exercise = TRUE}
+
+```
+
+```{r CholesterolClassesSleepApnea-solution}
+
+where2break <- quantile(sleepapnea_clean$cholesterol, c(0:3/3))
+sleepapnea_clean$Cholesterol_tert<- cut(sleepapnea_clean$cholesterol,breaks = where2break, 
+                               include.lowest = TRUE,right=FALSE)
+table(sleepapnea_clean$Cholesterol_tert)
+
+```
+
+
+b. Plot the distribution of the SleepApnea variable by group of "Cholesterol_tert".
+
+```{r CholesterolClassesSleepApneaPlot, exercise = TRUE}
+
+```
+
+```{r CholesterolClassesSleepApneaPlot-solution}
+boxplot(sleepapnea_clean$SleepApnea ~  sleepapnea_clean$Cholesterol_tert,  main="Distribution of SleepApnea by concentration of cholesterol", ylab="Sleep Apnea (number of pauses of breathing)", xlab="Concentration of cholesterol (tertiles)")
+
+```
+c. Formulate the statistical hypotheses to compare SleepApnea variable by cholesterol group.
+
+```{r CholesterolClassesSleepApneaHypo, exercise = TRUE}
+
+```
+
+```{r CholesterolClassesSleepApneaHypo-solution}
+
+H0 :  The average number of pauses of breathing are the same in each group
+H1 :  The average number of pauses of breathing differ in at least one case compare to the others
+
+```
+
+d. Test for the normality of the distribution of SleepApnea variable by group of "Cholesterol_tert".
+
+```{r CholesterolClassesSleepApneaNormality, exercise = TRUE}
+
+```
+
+```{r CholesterolClassesSleepApneaNormality-solution}
+
+by(sleepapnea_clean$SleepApnea, sleepapnea_clean$Cholesterol_tert, shapiro.test)
+
+```
+e. According to your previous findings, use the appropriate function and associated post-hoc test to verify your hypothesis.
+
+```{r CholesterolClassesSleepApneaKruskal, exercise = TRUE}
+
+```
+
+```{r CholesterolClassesSleepApneaKruskal-solution}
+
+res_kruskal = kruskal.test(formula = SleepApnea ~ Cholesterol_tert, data = sleepapnea_clean)
+summary(res_kruskal)
+
+library(rstatix)
+dunn_test(formula = SleepApnea ~ Cholesterol_tert, data = sleepapnea_clean)
+
+
+```
+
+f. Was the categorization of the "cholesterol" variable necessary ? Justify with a plot.
+
+```{r CholesterolClassesSleepApneaCat, exercise = TRUE}
+
+```
+
+```{r CholesterolClassesSleepApneaCat-solution}
+
+hist(sleepapnea_clean$cholesterol)
+#The distribution of this variable seems normal. A transformation was thus not necessary.
+
+```
+
+
+### 2. Is there an association between sleep apnea and triglyceride classes ?
+
+a. Define a new categorical variable ("Triglyceride_tert") using the tertiles of the distribution of the "Triglyceride" variable.
+
+```{r TriglycerideClassesSleepApnea, exercise = TRUE}
+
+```
+
+```{r TriglycerideClassesSleepApnea-solution}
+
+where2break <- quantile(sleepapnea_clean$Triglyceride, c(0:3/3))
+sleepapnea_clean$Triglyceride_tert<- cut(sleepapnea_clean$Triglyceride,breaks = where2break, 
+                               include.lowest = TRUE,right=FALSE)
+table(sleepapnea_clean$Triglyceride_tert)
+
+```
+
+
+b. Plot the distribution of the SleepApnea variable by group of "Triglyceride_tert".
+
+```{r TriglycerideClassesSleepApneaPlot, exercise = TRUE}
+
+```
+
+```{r TriglycerideClassesSleepApneaPlot-solution}
+boxplot(sleepapnea_clean$SleepApnea ~  sleepapnea_clean$Triglyceride_tert,  main="Distribution of SleepApnea by concentration of triglyceride", ylab="Sleep Apnea (number of pauses of breathing)", xlab="Concentration of triglyceride (tertiles)")
+
+```
+c. Formulate the statistical hypotheses to compare SleepApnea variable by triglyceride group.
+
+```{r TriglycerideClassesSleepApneaHypo, exercise = TRUE}
+
+```
+
+```{r TriglycerideClassesSleepApneaHypo-solution}
+
+H0 :  The average number of pauses of breathing are the same in each group
+H1 :  The average number of pauses of breathing differ in at least one case compare to the others
+
+```
+
+d. Test for the normality of the distribution of SleepApnea variable by group of "Triglyceride_tert".
+
+```{r TriglycerideClassesSleepApneaNormality, exercise = TRUE}
+
+```
+
+```{r TriglycerideClassesSleepApneaNormality-solution}
+
+by(sleepapnea_clean$SleepApnea, sleepapnea_clean$Triglyceride_tert, shapiro.test)
+
+```
+e. According to the previous findings, use the appropriate function and associated post-hoc test to verify your hypothesis.
+
+
+```{r TriglycerideClassesSleepApneaKruskal, exercise = TRUE}
+
+```
+
+```{r TriglycerideClassesSleepApneaKruskal-solution}
+
+res_kruskal = kruskal.test(formula = SleepApnea ~ Triglyceride_tert, data = sleepapnea_clean)
+summary(res_kruskal)
+
+library(rstatix)
+dunn_test(formula = SleepApnea ~ Triglyceride_tert, data = sleepapnea_clean)
+
+
+```
+
+f. Try to repeat the steps from b to e with the "Triglyceride_Cl_Ref" variable.
+
+```{r TriglycerideClassesSleepApneaKruskal2, exercise = TRUE}
+
+```
+
+```{r TriglycerideClassesSleepApneaKruskal2-solution}
+#Boxplot
+boxplot(sleepapnea_clean$SleepApnea ~  sleepapnea_clean$Triglyceride_Cl_Ref,  main="Distribution of SleepApnea by concentration of triglyceride", ylab="Sleep Apnea (number of pauses of breathing)", xlab="Concentration of triglyceride (biological cut-off)")
+
+#Hypothesis
+H0 :  The average number of pauses of breathing are the same in each group
+H1 :  The average number of pauses of breathing differ in at least one case compare to the others
+
+#Normality check
+by(sleepapnea_clean$SleepApnea, sleepapnea_clean$Triglyceride_Cl_Ref, shapiro.test)
+#An error message appears following this code line
+#This is because few people (2) are considered as "very high" with regards to theri triglyceride concentration  
+#Which make it impossible to conduct the test
+
+#Creation of a new variable with 3 modalities
+sleepapnea_clean$Triglyceride_Cl_Ref_bis <- ifelse(sleepapnea_clean$Triglyceride_Cl_Ref %in% c("Normal"), "Normal", 
+                                                 ifelse(sleepapnea_clean$Triglyceride_Cl_Ref %in% c("Bordeline"), "Bordeline", 
+                                                       ifelse(sleepapnea_clean$Triglyceride_Cl_Ref %in% c("High"), "High",
+                                                            ifelse(sleepapnea_clean$Triglyceride_Cl_Ref %in% c("Very High"), "High", sleepapnea_clean$Triglyceride_Cl_Ref))))
+table(sleepapnea_clean$Triglyceride_Cl_Ref_bis)
+
+#Test 
+#To complete after correction
+
+```
+
+g. Compare the results when using the "Triglyceride_tert" variable and the "Triglyceride_Cl_Ref" variable. What are your conclusions ?
+
+### 3. Is having more comorbities associated with sleep apnea ?
+
+Let's consider living with obesity, a triglyceride concentration > 5g/L and a cardiac frequency >85 as comoribidities.
+
+a. Create the three corresponding binary variables. 
+
+```{r ComorbiditiesSleepApneaComorb, exercise = TRUE}
+
+```
+
+```{r ComorbiditiesSleepApneaComorb-solution}
+
+sleepapnea_clean$obese <- ifelse(sleepapnea_clean$bmi < 30, 0, 1) # obese yes(1) or no(0)
+sleepapnea_clean$triglyceride_high <- ifelse(sleepapnea_clean$Triglyceride <= 5, 0, 1)
+sleepapnea_clean$CardiacFreq_high <- ifelse(sleepapnea_clean$CardiacFreq <= 85, 0, 1)
+
+```
+
+b. Create a score ranging from 0 to 3 corresponding to the sum of comorbidities then create a factor variable (named "bad_shape"). Check the distribution of this new variable and make the appropriate changes if needed.
+
+```{r ComorbiditiesSleepApneaSum, exercise = TRUE}
+
+```
+
+```{r ComorbiditiesSleepApneaSum-solution}
+# Sum of comorbidities
+sleepapnea_clean$bad_shape <- rowSums(sleepapnea_clean[ , c("obese", "triglyceride_high", "CardiacFreq_high")])
+table(sleepapnea_clean$bad_shape)
+# Transform into factor
+sleepapnea_clean$bad_shape <- factor(sleepapnea_clean$bad_shape, levels=c(0:3),
+                          labels=c("non", "1 comorbidity", "2 comorbidities", 
+                                   "3 comorbidities"))
+table(sleepapnea_clean$bad_shape)
+# group level number 4 with number 3 since only 1 person in "3 comorbidities"
+levels(sleepapnea_clean$bad_shape)[4] <- "2 comorbidities"
+table(sleepapnea_clean$bad_shape)
+# rename level 3 to "2 comorbidities or more"
+levels(sleepapnea_clean$bad_shape)[3] <- "2 comorbidities or more"
+table(sleepapnea_clean$bad_shape)
+
+```
+
+c. Conduct the appropriate test to investigate the association between the "SleepApnea" and the newly created variable "bad_shape".
+
+```{r ComorbiditiesSleepApneaTest, exercise = TRUE}
+
+```
+
+```{r ComorbiditiesSleepApneaTest-solution}
+
+#Normality check
+by(sleepapnea_clean$SleepApnea, sleepapnea_clean$bad_shape, shapiro.test)
+
+#Test
+res_kruskal = kruskal.test(formula = SleepApnea ~ bad_shape, data = sleepapnea_clean)
+summary(res_kruskal)
+
+library(rstatix)
+dunn_test(formula = SleepApnea ~ bad_shape, data = sleepapnea_clean)
+
+```
+
+d. Repeat the analysis (with the appropriate test) by considering the "SleepApnea" variable as a dichotomous one (cut-off : 70 pauses of breathing). 
+
+```{r ComorbiditiesSleepApneaTest2, exercise = TRUE}
+
+```
+
+```{r ComorbiditiesSleepApneaTest2-solution}
+
+```
