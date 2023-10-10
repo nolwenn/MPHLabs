@@ -162,6 +162,8 @@ Note: The output of `str()` is equivalent to the visual display of the blue dot 
 
 The *number* variable in the sleep apnea data set corresponds to the identifier of each patient. It should not be a numeric value but a character or factor (categorical variable).
 
+Note: You can use the dollar sign operator ($) in R to create and access variables in lists and data frames (here, the dataframe is "sleepapnea").
+
 a.  First, we transform into character the *number* variable using the function `as.character()`. One way of doing is to overwrite the *number* variable by selecting the vector(variable) *number* in the data set using the `$` sign and applying the `as.character()`:
 
 ```{r tocharacter, exercise = TRUE, exercise.eval = FALSE}
@@ -200,13 +202,15 @@ d.  To practice, rename the *Triglyceride_Cl_Ref* modalities using the existing 
 ```
 
 ```{r TriglycerideCl-solution}
+summary(sleepapnea$Triglyceride_Cl_Ref)
 sleepapnea$Triglyceride_Cl_Ref <- factor(sleepapnea$Triglyceride_Cl_Ref, levels = c(0:3),
                               labels=c("Normal","Bordeline",
                                        "High", "Very High"))
 summary(sleepapnea$Triglyceride_Cl_Ref)
 ```
 
-Caution : Every time you define a new variable or object with the same name as the original one, R forgets the old value. Therefore you should reuse variable or object names with caution, because it can become difficult to remember what the latest value was or you may need to correct a mistake made when categorizing a continuous variable! As for the *triglyceride* variable, try to have specific names for each new variable you create!
+Caution : Every time you define a new variable or object with the same name as the original one, R forgets the old value. Therefore you should reuse variable or object names with caution, because it can become difficult to remember what the latest value was or you may need to correct a mistake made when categorizing a continuous variable! As for the *Triglyceride* variable (used to initially create the *Triglyceride_Cl_Ref* variable), try to have specific names for each new variable you create!
+
 
 ### 4. Save the clean data set
 
@@ -284,8 +288,8 @@ d.  Compute the mean, standard deviation, mediane, quartiles for the variable ag
 mean(sleepapnea_clean$age, na.rm=TRUE)
 sd(sleepapnea_clean$age, na.rm=TRUE)
 median(sleepapnea_clean$age, na.rm=TRUE)
-quantile(sleepapnea_clean$age, na.rm=TRUE)
-quantile(sleepapnea_clean$age, probs= c(0, 0.3, 0.6), na.rm=TRUE)
+quantile(sleepapnea_clean$age, na.rm=TRUE) #the quantile() function provides by default quartiles, min and max
+quantile(sleepapnea_clean$age, probs= c(0, 0.3, 0.6), na.rm=TRUE) #extra example 
 ```
 
 e.  What is the best graph for the variable age?
@@ -300,8 +304,10 @@ Draw the age distribution using the hist() function. Choose a width of age class
 ```
 
 ```{r agehist2-solution}
-hist(sleepapnea_clean$age, width=2, main="distribution of age", xlab="age (years)")
-hist(sleepapnea_clean$age, width=5, main="distribution of age", xlab="age (years)")
+#Thanks to the summary() function previously used, you were able to distinguish the min (23 years) and max (74 years). 
+#We use these information to answer this question
+hist(sleepapnea_clean$age, breaks=seq(20, 80, 2), main="distribution of age", xlab="age (years)")
+hist(sleepapnea_clean$age, breaks=seq(20, 80, 5), main="distribution of age", xlab="age (years)")
 ```
 
 f.  The `boxplot()` function summarize the quantile parameters for a quantitative variable. Below if the boxplot for the *age* variable. Interpret it:
@@ -379,7 +385,7 @@ sleepapnea_clean %>% group_by(bmi_3grp) %>% summarise("mean_apnea"=mean(SleepApn
 **Example 1:** We would like to compare of the mean of sleep apnea among the 2 groups of bmi. 
 
 ```{r quiz, echo=FALSE}
-quiz(question("What statistical tests could be of relevance? (select the two correct options)",
+question("What statistical tests could be of relevance? (select the two correct options)",
   answer("T-test", correct = TRUE),
   answer("ANOVA"),
   answer("Fisher test"),
@@ -387,7 +393,9 @@ quiz(question("What statistical tests could be of relevance? (select the two cor
   incorrect = "Incorrect. Give it another try.", 
   random_answer_order = TRUE,
   post_message = "Perfection! You got it. We have then two options: let's say, we go for the T-test option."
-),
+)
+```
+```{r quiz1, echo=FALSE}
 question("What are the assumptions to be checked if the t-test was to be chosen? (select the two correct options)",
   answer("Normality", correct = TRUE),
   answer("Expected frequencies are lower than 5"),
@@ -395,7 +403,6 @@ question("What are the assumptions to be checked if the t-test was to be chosen?
   answer("Equal variance", correct = TRUE),
   incorrect = "Are you sure ? Give it another try!",
   random_answer_order = TRUE
-)
 )
 ```
 
@@ -525,7 +532,7 @@ d. Test for the normality of the distribution of *SleepApnea* variable by group 
 
 
 ```{r quiz2, echo=FALSE}
-quiz(question("For this test, what is the H0 hypothesis? (select the correct answer)",
+question("For this test, what is the H0 hypothesis? (select the correct answer)",
   answer("The distribution of the "SleepApnea" variable in the different groups of cholesterol concentration is not different from a Normal distribution", correct = TRUE),
   answer("The distribution of the "SleepApnea" variable in the different groups of cholesterol concentration is different from a Normal distribution"),
   answer("The distribution of the "SleepApnea" variable is different from a Normal distribution"),
@@ -533,7 +540,6 @@ quiz(question("For this test, what is the H0 hypothesis? (select the correct ans
   incorrect = "Incorrect. Give it another try.", 
   random_answer_order = TRUE,
   post_message = "Alright! You got it. Now, let's run the test and interpret the result."
-)
 )
 ```
 
