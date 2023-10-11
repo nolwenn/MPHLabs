@@ -97,7 +97,7 @@ Reading functions in *R* follows common rules with similar arguments. The most i
 -   *header=* to specify if your file contains a header with column names
 -   *sep=* to specify the type of column separator (",", ";", "/")
 
-The `read.csv()` function is a generic function to read tabulated data set. To store the output of the `read.csv()` function in a R object we use the assignment operator, `<-`. For example, here we name our object *sleepapnea*
+The `read.csv()` function is a generic function to read tabulated data set. To store the output of the `read.csv()` function in a R object we use the assignment operator, `<-`. For example, here we name our object *sleepapnea* (the dataframe).
 
 To give it a try, do one of the following:
 
@@ -152,7 +152,7 @@ To look at your data structure in the R console you can use the `str()` function
 str(sleepapnea)
 ```
 
-Your data set is a `data.frame` which is a rectangular R data format where variables can be of different types (e.g. numeric, character, factor...).
+Your data set is a `data.frame` which is a rectangular R data format where variables can be of different types (e.g. numeric, integrer, character, factor...). The most common data type in R is *numeric*. A variable or a series will be stored as numeric data if the values are numbers or if the values contains decimals. *Integer* data type is actually a special case of numeric data. Integers are numeric data without decimals. The data type *character* is used when storing text, known as strings in R. *Factor* variables are a special case of character variables in the sense that it also contains text. However, factor variables are used when there are a limited number of unique character strings. It often represents a categorical variable. For instance, the gender will usually take on only two values, “female” or “male” (and will be considered as a factor variable) whereas the name or identification number will generally have lots of possibilities (and thus will be considered as a character variable).
 
 **Looking at your object, is the output consistent with what you expected in terms of variables' types?**
 
@@ -162,7 +162,7 @@ Note: The output of `str()` is equivalent to the visual display of the blue dot 
 
 The *number* variable in the sleep apnea data set corresponds to the identifier of each patient. It should not be a numeric value but a character or factor (categorical variable).
 
-Note: You can use the dollar sign operator ($) in R to create and access variables in lists and data frames (here, the dataframe is "sleepapnea").
+Note: You can use the dollar sign operator ($) in R to create and access variables in lists and data frames (here, the data.frame is "sleepapnea").
 
 a.  First, we transform into character the *number* variable using the function `as.character()`. One way of doing is to overwrite the *number* variable by selecting the vector(variable) *number* in the data set using the `$` sign and applying the `as.character()`:
 
@@ -533,9 +533,9 @@ d. Test for the normality of the distribution of *SleepApnea* variable by group 
 
 ```{r quiz2, echo=FALSE}
 question("For this test, what is the H0 hypothesis? (select the correct answer)",
-  answer("The distribution of the "SleepApnea" variable in the different groups of cholesterol concentration is not different from a Normal distribution", correct = TRUE),
-  answer("The distribution of the "SleepApnea" variable in the different groups of cholesterol concentration is different from a Normal distribution"),
-  answer("The distribution of the "SleepApnea" variable is different from a Normal distribution"),
+  answer("The distribution of the SleepApnea variable in the different groups of cholesterol concentration is not different from a Normal distribution", correct = TRUE),
+  answer("The distribution of the SleepApnea variable in the different groups of cholesterol concentration is different from a Normal distribution"),
+  answer("The distribution of the SleepApnea variable is different from a Normal distribution"),
   answer("None of the above"),
   incorrect = "Incorrect. Give it another try.", 
   random_answer_order = TRUE,
@@ -562,9 +562,6 @@ e. According to your previous findings, use the appropriate function and associa
 
 #We rejected H0
 kruskal.test(formula = SleepApnea ~ Cholesterol_tert, data = sleepapnea_clean)
-
-library(rstatix)
-dunn_test(formula = SleepApnea ~ Cholesterol_tert, data = sleepapnea_clean)
 
 
 ```
@@ -655,9 +652,6 @@ e. According to the previous findings, use the appropriate function and associat
 
 kruskal.test(formula = SleepApnea ~ Triglyceride_tert, data = sleepapnea_clean)
 
-library(rstatix)
-dunn_test(formula = SleepApnea ~ Triglyceride_tert, data = sleepapnea_clean)
-
 
 ```
 
@@ -690,9 +684,6 @@ table(sleepapnea_clean$Triglyceride_Cl_Ref_bis)
 
 #Test 
 kruskal.test(formula = SleepApnea ~ Triglyceride_Cl_Ref_bis, data = sleepapnea_clean)
-
-library(rstatix)
-dunn_test(formula = SleepApnea ~ Triglyceride_Cl_Ref_bis, data = sleepapnea_clean)
 
 ```
 
@@ -759,7 +750,7 @@ dunn_test(formula = SleepApnea ~ bad_shape, data = sleepapnea_clean)
 
 ```
 
-d. Repeat the analysis (with the appropriate test) by considering the *SleepApnea* variable as a dichotomous one (cut-off : 70 pauses of breathing). 
+d. Repeat the analysis (with the appropriate test) by considering the *SleepApnea* variable as a dichotomous one (cut-off : 70 pauses of breathing). Use the ifelse() function (?ifelse) to create this new variable.
 
 ```{r ComorbiditiesSleepApneaTest2, exercise = TRUE}
 
@@ -800,7 +791,7 @@ a. Which variable is the dependent variable ? Which variable is the independent 
 
 ```
 
-The "SleepApnea" variable is somehow skewed, so we prefer to use its log transformed version (created before) to assess any linear association.
+The *SleepApnea* variable is somehow skewed, so we prefer to use its log transformed version (created before) to assess any linear association.
 
 b. Represent and comment on the relationship between *SleepApnea_log* and *bmi* using the ggplot() function (?ggplot).
 
@@ -865,7 +856,7 @@ layout(1)
 
 ```
 
-f. Interpret the results
+f. Interpret the results.
 
 ```{r SleepApnealogBmiInt, exercise = TRUE}
 
@@ -873,7 +864,7 @@ f. Interpret the results
 
 ```{r SleepApnealogBmiInt-solution}
 
-#For 1 unit increase in bmi, there is 0.029 increase in log(sleepapnea)
+#For 1 unit increase in bmi, there is 0.029 increase in SleepApnea_log
 
 ```
 ### Is there a linear association between sleep apnea and age? 
@@ -918,7 +909,7 @@ plot(model)
 layout(1)
 
 #Interpret the results
-#There is no association between age and log(sleepapnea)
+#There is no association between age and SleepApnea_log
 
 ```
 
@@ -964,7 +955,7 @@ plot(model)
 layout(1)
 
 #Interpret the results
-#For 1 unit increase in cardiac frequency, there is 0.009 increase in log(sleepapnea)
+#For 1 unit increase in cardiac frequency, there is 0.009 increase in SleepApnea_log
 
 ```
 
@@ -977,4 +968,60 @@ You have performed simple linear regression and see the limits. What do you thin
 
 ## Part F - Logistic regression analysis
 
-In progress
+### Is there an association between sleep apnea (considered as a binary variable) and various socio-demographic and biological factors ?
+
+Previously, was created the *SleepApnea_grp* variable (Part D). This variable will be considered as our dependent variable.
+
+```{r quizlogistic, echo=FALSE}
+question("What are the main assumptions of logistic regression? (select the two correct options)",
+  answer("Independence of observations", correct = TRUE),
+  answer("Homoscedasticity of residuals"),
+  answer("Normality of residuals"),
+  answer("Linearity of continuous explanatory variables and the log-odds outcome", correct = TRUE),
+  incorrect = "Incorrect. Give it another try.", 
+  random_answer_order = TRUE,
+  post_message = "Correct! For the following questions/tests, consider that these assumptions (when applicable) are fulfilled."
+)
+```
+
+a. Using the glm() function, run a logistic regression to investigate the association between sleep apnea and age.
+
+```{r SleepApneaLogisticAge, exercise = TRUE}
+
+```
+
+```{r SleepApneaLogisticAge-solution, exercise = TRUE}
+#If using the *SleepApnea_grp* variable without any transformation, you will get an error message as follows:
+#"y values must be 0 <= y <= 1" 
+#because for a logistic regression using the glm function the dependent variable should take two modalities as 0 and 1
+
+#create a new *SleepApnea_grp01* variable 
+sleepapnea_clean$SleepApnea_grp01 <- ifelse(sleepapnea_clean$SleepApnea_grp %in% c("high"), 1, 0)
+
+#run the analysis with the newly created variable
+logit1 <- glm(formula = SleepApnea_grp01 ~ age, data = sleepapnea_clean, family = "binomial"(link = "logit"))
+summary(logit1)
+
+exp(coef(logit1))
+exp(confint(logit1))
+
+```
+
+b. Interpret your results.
+
+```{r SleepApneaLogisticAgeInter, exercise = TRUE}
+
+```
+
+```{r SleepApneaLogisticAgeInter-solution, exercise = TRUE}
+
+#There is no association between age and sleep apnea
+
+```
+
+c. Repeat the analysis conducted in question a. with the following independent variables : gender, cholesterol (continuous), cardiac frequency (continuous) and bmi (continuous). Compare some results with the analyses you conducted considering sleep apnea as a continuous variable (part E).
+
+```{r SleepApneaLogisticVarious, exercise = TRUE}
+
+```
+
