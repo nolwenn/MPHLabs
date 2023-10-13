@@ -50,24 +50,35 @@ load("../../data/sleepapnea_clean.Rdata")
 
 This is an **interactive version of the MPH1 computer labs** with the statistical software *R*. **Your objective is to learn the basic of R** while running online examples and trying some exercises. The tutorial uses the Sleep apnea data set, presented in the next section.
 
+A dataset is the basic element in research. It contains units and variables. Individuals or statistical units are in rows, variables in columns. 
+
+A table of this kind generally includes two kinds of variables: those used to identify the statistical units (in research, this is often a single anonymized variable, an identifier) and those measured for the study (measurements, socio-economic factors etc.).
+
+
 ### 
 
 In this tutorial, you will learn how to:
 
 -   read a dataset stored on your computer (as a CSV file)
 -   explore the data format and the different type of variables
--   compute descriptive statistic
+-   compute descriptive statistics
 -   display plots
 -   compute univariate statistical test
--   compute simple linear and logistic regression
+-   compute simple and multiple linear and logistic regression
 
 Every R code chunk is link to a R engine and, when you hit the *Run code* button, the code is interpreted.
 
 ```{r example, exercise = TRUE, exercise.eval = FALSE}
 ```
 
-For the examples, we invite you to run the code and for the exercises we invite you to go beyond the example by adding arguments or completing with other R functions. 
-Disclaimer : There are a lot of R functions. As you get more familiar with R, you’ll begin to memorize basic functions - and Google is always there for the rest.
+To describe and analyze data in R, functions are needed. A package is a set of R functions and data-sets and the library is a folder on your system / computer which stores the files for those package(s). Packages can be installed thanks to the install.packages()basic function.
+
+There are a lot of R functions. Each function has a help page describing this function, its arguments and provides some examples. The *help()* function and *?* help operator in R provide access to the documentation pages for R functions, data sets, and other objects.
+
+As you get more familiar with R, you’ll begin to memorize basic functions - and Google is always there for the rest.
+
+For the examples provided below, we invite you to run the code and for the exercises to first give it a try and then click on the **solution** button to check. We also invite you to go beyond the examples by adding arguments or completing with other R functions.
+
 
 [As companion websites, we invite you to look at:]{.underline}
 
@@ -101,14 +112,15 @@ The `read.csv()` function is a generic function to read tabulated data set. To s
 
 To give it a try, do one of the following:
 
-- Place the cursor on the desired line, hold the *control* key, and press enter. On macOS, hold *command* key and press return instead;
-- Place the cursor on the desired line and click the *Run Code* button.
+- Place the cursor on the desired line and click the *Run Code* button (as mentioned before);
+- Place the cursor on the desired line, hold the *control* key, and press enter. On macOS, hold *command* key and press return instead.
+
 
 ```{r read, exercise = TRUE, exercise.eval = FALSE, warnings=FALSE, message=FALSE}
 sleepapnea <- read.csv(file="https://raw.githubusercontent.com/nolwenn/MPHLabs/main/data/SleepApnea.csv", header=TRUE, sep=",")
 ```
 
-For a quick verification of the reading output, you can use `head()` or `tail()` to observe the first 6 or last 6 rows for your R object *sleepapnea*.
+For a quick verification of the reading output, you can use the `head()` or `tail()` functions to observe the first 6 or last 6 rows for your R object *sleepapnea*.
 
 Run the command below to test the `head()` function:
 
@@ -160,7 +172,7 @@ Note: The output of `str()` is equivalent to the visual display of the blue dot 
 
 ### 3. Data type conversion
 
-The *number* variable in the sleep apnea data set corresponds to the identifier of each patient. It should not be a numeric value but a character or factor (categorical variable).
+The *number* variable in the sleep apnea data set corresponds to the anonymous identifier of each patient. It should not be a numeric value but a character or factor (categorical variable). From an analysis perspective, this variable is needed in order to merge two data sets containing the same statistical units (see the merge() function).
 
 Note: You can use the dollar sign operator ($) in R to create and access variables in lists and data frames (here, the data.frame is "sleepapnea").
 
@@ -169,6 +181,8 @@ a.  First, we transform into character the *number* variable using the function 
 ```{r tocharacter, exercise = TRUE, exercise.eval = FALSE}
 sleepapnea$number <- as.character(sleepapnea$number)
 ```
+You can also use the following option to proceed: sleepapnea[c('number')] <- as.character(sleepapnea$number)
+
 
 Similarly, the *gender* variable should be a factor (categorical variable) and not a character: 
 
@@ -209,8 +223,9 @@ sleepapnea$Triglyceride_Cl_Ref <- factor(sleepapnea$Triglyceride_Cl_Ref, levels 
 summary(sleepapnea$Triglyceride_Cl_Ref)
 ```
 
-Caution : Every time you define a new variable or object with the same name as the original one, R forgets the old value. Therefore you should reuse variable or object names with caution, because it can become difficult to remember what the latest value was or you may need to correct a mistake made when categorizing a continuous variable! As for the *Triglyceride* variable (used to initially create the *Triglyceride_Cl_Ref* variable), try to have specific names for each new variable you create!
+Caution : **Every time you define a new variable or object with the same name as the original one, R forgets the old value.** Therefore you should reuse variable or object names with caution, because it can become difficult to remember what the latest value was or you may need to correct a mistake made when categorizing a continuous variable! As for the *Triglyceride* variable (used to initially create the *Triglyceride_Cl_Ref* variable), try to have specific names for each new variable you create!
 
+Of note: The *Triglyceride_Cl_Ref* variable was previously created, based on the continuous one (*Triglyceride*), and thanks to the ifelse() function. 
 
 ### 4. Save the clean data set
 
@@ -226,6 +241,7 @@ Or you can also write the resulting data.frame into a new CSV file that you will
 ```{r writedata, exercise = TRUE, exercise.eval = FALSE}
 write.csv(sleepapnea_clean, file="sleepapnea_clean.csv")
 ```
+Final note: More often than not, you don’t need all dataset columns for your analysis. R provides a couple of ways to select columns of interest. For example, the subset() function might help you to do so.
 
 ## Part B - Descriptive Analysis
 
@@ -285,7 +301,7 @@ d.  Compute the mean, standard deviation, mediane, quartiles for the variable ag
 ```
 
 ```{r agedesc-solution}
-mean(sleepapnea_clean$age, na.rm=TRUE)
+mean(sleepapnea_clean$age, na.rm=TRUE) ) #The “na.rm=T” argument is to be used when there are missing data for a variable 
 sd(sleepapnea_clean$age, na.rm=TRUE)
 median(sleepapnea_clean$age, na.rm=TRUE)
 quantile(sleepapnea_clean$age, na.rm=TRUE) #the quantile() function provides by default quartiles, min and max
@@ -378,14 +394,29 @@ Note : The pipe operator (%>%) in R is used to “pipe” together a sequence of
 sleepapnea_clean %>% group_by(bmi_3grp) %>% summarise("mean_apnea"=mean(SleepApnea, na.rm = TRUE))
 ```
 
-**Practice:** Try with other quatitative variables of the data set such as age, height or weight which could be some confounding factors.  Of note, a confounding variable is a third variable that influences, or “confounds,” the relationship between an independent and a dependent variable by suggesting the presence of a spurious correlation.
+**Practice:** Try with other quatitative variables of the data set such as age.
 
 ### 2. Statistical tests of association
 
 **Example 1:** We would like to compare of the mean of sleep apnea among the 2 groups of bmi. 
 
+What are the hypotheses tested here?
+
+```{r sleepapneabmihypo, exercise = TRUE }
+
+```
+
+```{r sleepapneabmihypo-solution, exercise = TRUE }
+
+#The hypotheses tested here are:
+#H0: The average of sleep apnea among those with overweight is equal to the average of sleep apnea among those without overweight 
+#H1: The average of sleep apnea among those with overweight is equal to the average of sleep apnea among those without overweight
+
+```
+
+
 ```{r quiz, echo=FALSE}
-question("What statistical tests could be of relevance? (select the two correct options)",
+question("What statistical tests could be of relevance to test these hypotheses? (select the two correct options)",
   answer("T-test", correct = TRUE),
   answer("ANOVA"),
   answer("Fisher test"),
@@ -406,7 +437,7 @@ question("What are the assumptions to be checked if the t-test was to be chosen?
 )
 ```
 
-a.  Since we consider the mean we suppose that we have normally distributed values of sleep apnea in the 2 bmi groups. Let's verify using the classical Shapiro test:
+a.  Since we consider the mean/average, we assume that we have normally distributed values of sleep apnea in the 2 bmi groups. Let's verify using the classical Shapiro test:
 
 ```{r apneabmi, exercise = TRUE, exercise.eval = FALSE}
 by(sleepapnea_clean$SleepApnea, sleepapnea_clean$bmi_2grp, shapiro.test)
@@ -414,10 +445,25 @@ by(sleepapnea_clean$SleepApnea, sleepapnea_clean$bmi_2grp, shapiro.test)
 
 What are your conclusions?
 
+
+```{r shapirotestint, exercise = TRUE }
+
+```
+
+```{r shapirotestint-solution, exercise = TRUE }
+
+#We rejected H0 (here: normal distribution of sleep apnea in both group). 
+#No need to check for the “equality of variance” assumption required to proceed with a t-test.
+
+```
+
+
 b.  Given the result of the Shapiro test, we choose to use the non-parametric test `wilcox.test()` to assess for a potential association. Try to apply the test and interpret the results:
 
 ```{r wilcox, exercise = TRUE, exercise.eval = FALSE}
 wilcox.test(SleepApnea ~ bmi_2grp, data= sleepapnea_clean)
+#Interpretation
+#Based on the p-value obtained above: there is an association between sleep apnea and bmi (categorized in two groups)
 ```
 
 Note: For most statistical tests of association, the *R* syntax is of type formula i.e. `func(y ~ x, data=mydata)` but you might want to look at the help pages of the different test functions for the details of their usage.
@@ -432,17 +478,32 @@ c.  Given the result of the Shapiro test, we can also try to transform the sleep
 sleepapnea_clean$SleepApnea_log <- log(sleepapnea_clean$SleepApnea)
 by(sleepapnea_clean$SleepApnea_log, sleepapnea_clean$bmi_2grp, shapiro.test) #check that the new created variable is normally distributed
 t.test(SleepApnea_log ~ bmi_2grp, data=sleepapnea_clean)
+
+#Interpretation
+#We rejected H0 (p<0.05) : there is an association between SleepApnea_log and bmi (categorized in two groups) 
 ```
+d. Are results different in question b and c?
 
 To sum up : Transforming data to normal distribution is a method of changing the distribution by applying a mathematical function to each data value. This can help to achieve normality in modeling problems. Depending on the actual variable distribution, some common functions are logartithm and square root transformations, adding, subtracting, multiplying, but also dividing. Other options are to use the Box-Cox or Yeo-Johnson transforms. There are times when it's not possible to transform your data, and in such cases you need to use non-parametric tests.
 
-**Example 2:** We would like to compare the distribution of sleep apnea measures among the 3 groups of bmi. Given the repartition of the patients among the 3 groups of bmi, we propose to use the `kruskal.test()` non-parametric rank sum test to assess the differences (or not) between groups:
+**Example 2:** We would like to compare the distribution of sleep apnea measures among the 3 groups of bmi (*H0: The average number of pauses of breathing are the same in each bmi group*). Given the repartition of the patients among the 3 groups of bmi (non-normal), we propose to use the `kruskal.test()` non-parametric rank sum test to assess the differences (or not) between groups:
 
 ```{r kruskal, exercise = TRUE, exercise.eval = FALSE}
 kruskal.test(SleepApnea ~ bmi_3grp, data= sleepapnea_clean)
 ```
 
 What is your interpretation?
+
+```{r sleepapneabmi3grpint, exercise = TRUE }
+
+```
+
+```{r sleepapneabmi3grpint-solution, exercise = TRUE }
+
+#Interpretation
+#We rejected H0 (p<0.05). We highlighted a statistically significant association between sleep apnea and bmi.
+
+```
 
 To identify which groups differ from the other(s) you can use the `dunn_test()` from the `rstatix` library
 
@@ -451,12 +512,33 @@ library(rstatix)
 dunn_test(SleepApnea ~ bmi_3grp, data= sleepapnea_clean)
 ```
 
-**Example 3:** We would like to test whether there is an association between gender and bmi groups. What statistical tests to choose? What are the assumptions?
+In example 1 and 2, *bmi* was re-coded differently (2 modalities vs. 3). Does that make a difference in terms of the conclusions made?
+
+
+**Example 3:** We would like to test whether there is an association between gender and bmi groups. 
+
+What statistical tests to choose? What are the assumptions?
+```{r genderbmihypo, exercise = TRUE}
+
+```
+
+```{r genderbmihypo-solution}
+
+#Since two categorical variables are considered here, a chi2 test should be perform.
+
+#H0: the distribution of people in the different bmi groups is equal among females and males 
+#H1: the distribution of people in the different bmi groups is different among females and males
+```
+
 
 a.  We consider the gender and bmi groups which are categorical variables. We can perform a Fisher Exact test using `fisher.test()`:
 
 ```{r fisher, exercise = TRUE, exercise.eval = FALSE}
 fisher.test(sleepapnea_clean$gender, sleepapnea_clean$bmi_2grp)
+
+#Interpretation
+#To be completed according to the p-value obtained above: we failed to reject H0 (p>0.05). There is no relation between gender and bmi.
+
 ```
 
 b.  A similar test is the Chi Square test that you can apply using `chisq.test()`. Have a try and interpret the results:
@@ -550,9 +632,10 @@ question("For this test, what is the H0 hypothesis? (select the correct answer)"
 ```{r CholesterolClassesSleepApneaNormality-solution}
 
 by(sleepapnea_clean$SleepApnea, sleepapnea_clean$Cholesterol_tert, shapiro.test)
+#We rejected H0. A non-parametric test is thus needed to test the association of interest here.
 
 ```
-e. According to your previous findings, use the appropriate function and associated post-hoc test to verify your hypothesis.
+e. According to your previous findings, use the appropriate function and associated post-hoc test (if needed) to verify your hypothesis. Interpret your results.
 
 ```{r CholesterolClassesSleepApneaKruskal, exercise = TRUE}
 
@@ -560,18 +643,20 @@ e. According to your previous findings, use the appropriate function and associa
 
 ```{r CholesterolClassesSleepApneaKruskal-solution}
 
-#We rejected H0
 kruskal.test(formula = SleepApnea ~ Cholesterol_tert, data = sleepapnea_clean)
-
+#Interpretation
+#We failed to reject H0. There is no overall association between these two variables. No need for a post-hoc analysis.
 
 ```
-f. Another option would be to use the *SleepApnea_log* variable. Re-run the analysis with this variable.
+
+f. Another option would be to use the *SleepApnea_log* variable. Re-run the analysis with this variable and using the appropriate test. Interpret your results.
 
 ```{r CholesterolClassesSleepApnealog, exercise = TRUE}
 
 ```
 
 ```{r CholesterolClassesSleepApnealog-solution}
+
 
 ```
 
@@ -641,7 +726,7 @@ d. Test for the normality of the distribution of *SleepApnea* variable by group 
 by(sleepapnea_clean$SleepApnea, sleepapnea_clean$Triglyceride_tert, shapiro.test)
 
 ```
-e. According to the previous findings, use the appropriate function and associated post-hoc test to verify your hypothesis.
+e. According to the previous findings, use the appropriate function and associated post-hoc test (if needed) to verify your hypothesis. Interpret your results.
 
 
 ```{r TriglycerideClassesSleepApneaKruskal, exercise = TRUE}
@@ -651,7 +736,9 @@ e. According to the previous findings, use the appropriate function and associat
 ```{r TriglycerideClassesSleepApneaKruskal-solution}
 
 kruskal.test(formula = SleepApnea ~ Triglyceride_tert, data = sleepapnea_clean)
-
+#Interpretation
+#We failed to reject H0. There is no association between sleep apnea and triglyceride concentration (categorized the way it is here). 
+#No need, thus, to conduct a post-hoc test.
 
 ```
 
@@ -685,15 +772,29 @@ table(sleepapnea_clean$Triglyceride_Cl_Ref_bis)
 #Test 
 kruskal.test(formula = SleepApnea ~ Triglyceride_Cl_Ref_bis, data = sleepapnea_clean)
 
+#Interpretation
+#We failed to reject H0. There is no association between those two variables.
+
 ```
 
 g. Compare the results when using the *Triglyceride_tert* variable and the *Triglyceride_Cl_Ref* variable. What are your conclusions ?
 
+```{r comparetriglysleepapnea, exercise = TRUE}
+
+```
+
+```{r comparetriglysleepapnea-solution}
+
+#No matter how the Triglyceride continuous variable is categorized (quantile-based or clinically-based cut-offs), there is no association between sleep apnea and the triglyceride concentration.
+
+```
+
+
 ### 3. Is having more comorbities associated with sleep apnea ?
 
-Let's consider living with obesity, a triglyceride concentration > 5g/L and a cardiac frequency >85 as comoribidities.
+Let's consider living with obesity (bmi >30kg/m2), a triglyceride concentration > 5g/L and a cardiac frequency >85 bpm (beats per minute) as comoribidities.
 
-a. Create the three corresponding binary variables. 
+a. Based on the original continuous variables, create the three corresponding binary variables. 
 
 ```{r ComorbiditiesSleepApneaComorb, exercise = TRUE}
 
@@ -738,12 +839,19 @@ c. Conduct the appropriate test to investigate the association between the *Slee
 ```
 
 ```{r ComorbiditiesSleepApneaTest-solution}
+#Hypotheses
+#H0: the average of sleep apnea is similar no matter the number of comorbidities  
+#H1: the average of sleep apnea is different according to the number of comorbidities
 
 #Normality check
 by(sleepapnea_clean$SleepApnea, sleepapnea_clean$bad_shape, shapiro.test)
 
 #Test
 kruskal.test(formula = SleepApnea ~ bad_shape, data = sleepapnea_clean)
+
+#Interpretation
+#We rejected H0 (though at the limit of the significance). There is an association between sleep apnea and comorbidities. 
+#A post-hoc test can be undertaken.
 
 library(rstatix)
 dunn_test(formula = SleepApnea ~ bad_shape, data = sleepapnea_clean)
@@ -765,12 +873,15 @@ sleepapnea_clean$SleepApnea_grp <-  ifelse(sleepapnea_clean$SleepApnea < 70, "no
 # H0: Equal distribution of people with ou without comorbidities among the high and normal sleep apnea
 # H1: Different distribution
 
-#Distribution
+#Distribution (contengency table)
 round(prop.table(xtabs( ~ bad_shape + SleepApnea_grp, data = sleepapnea_clean), 2)*100,2)
 #Among those with a normal number of pauses of breathing, around 67% has no comorbidity against only around 28% among #those with a higher number of pauses of breathing
 
 #Test
 fisher.test(sleepapnea_clean$bad_shape, sleepapnea_clean$SleepApnea_grp)
+
+#Interpretation
+#Based on the p-value obtained above: We rejected H0 (p<0.05). There is an association between sleep apnea and comorbidities.
 
 ```
 
@@ -959,12 +1070,12 @@ layout(1)
 
 ```
 
-You have performed simple linear regression and see the limits. What do you think you should do next to assess the possible effect of the different risk factors?
+You have performed simple linear regressions. Simple linear regression models can be too simplistic and the conclusions may be wrong. In reality, diseases are most often multi-factorial, thus, a particular relation of interest might be **confounded** by various other factors.
 
+A **confounder** is an extraneous variable whose presence affects the variables being studied so that the results do not reflect the actual relation between the variables under study. 
 
-```{r SleepApneaLinearRegLimits, exercise = TRUE}
+In **multiple linear regression** (*see Part G*), investigators can include many potential **confounders** at one time. The process of accounting for them is also called **adjustment** and comparing the results of simple and multiple linear regressions can clarify that: how much the confounders in the model distort the relation between exposure and outcome?
 
-```
 
 ## Part F - Logistic regression analysis
 
@@ -1015,7 +1126,8 @@ b. Interpret your results.
 
 ```{r SleepApneaLogisticAgeInter-solution, exercise = TRUE}
 
-#There is no association between age and sleep apnea
+#There is no association between age and sleep apnea. Or : an increase in age is not associated with an increase in the probability of having high sleep apnea.
+#Results are similar than those with the sleep apnea variable as a continuous variable.
 
 ```
 
@@ -1024,4 +1136,42 @@ c. Repeat the analysis conducted in question a. with the following independent v
 ```{r SleepApneaLogisticVarious, exercise = TRUE}
 
 ```
+```{r SleepApneaLogisticVarious-solution}
+
+#CardiacFreq as the independent variable
+logit2 <- glm(formula = SleepApnea_grp01 ~ CardiacFreq, data = sleepapnea_clean, family = "binomial"(link = "logit"))
+summary(logit2)
+exp(coef(logit2))
+exp(confint(logit2)) 
+#Interpretation : there is an association between these two variables
+
+#bmi as the independent variable
+logit3 <- glm(formula = SleepApnea_grp01 ~ bmi, data = sleepapnea_clean, family = "binomial"(link = "logit"))
+summary(logit3)
+exp(coef(logit3))
+exp(confint(logit3)) 
+#Interpretation : there is an association between these two variables
+
+#cholesterol as the independent variable
+logit4 <- glm(formula = SleepApnea_grp01 ~ cholesterol, data = sleepapnea_clean, family = "binomial"(link = "logit"))
+summary(logit4)
+exp(coef(logit4))
+exp(confint(logit4)) 
+#Interpretation : there is no association between these two variables
+
+#age as the independent variable
+logit5 <- glm(formula = SleepApnea_grp01 ~ age, data = sleepapnea_clean, family = "binomial"(link = "logit"))
+summary(logit5)
+exp(coef(logit5))
+exp(confint(logit5)) 
+#Interpretation : there is no association between these two variables
+
+
+```
+
+Note: Some analyses conducted in *Part F* are often called **sensitivity analyses** in research papers. **Sensitivity analyses** play a crucial role in assessing the robustness of the findings or conclusions based on primary analyses of data in clinical trials or epidemiological studies. They are a critical way to assess the impact, effect or influence of key assumptions or variations—such as different methods of analysis, definitions of outcomes, protocol deviations, missing data, and outliers—on the overall conclusions of a study.
+
+## Part G: Multiple linear and logistic regressions
+
+### In progress
 
