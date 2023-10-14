@@ -71,9 +71,9 @@ Every R code chunk is link to a R engine and, when you hit the *Run code* button
 ```{r example, exercise = TRUE, exercise.eval = FALSE}
 ```
 
-To describe and analyze data in R, functions are needed. A package is a set of R functions and data-sets and the library is a folder on your system / computer which stores the files for those package(s). Packages can be installed thanks to the install.packages()basic function.
+To describe and analyze data in R, functions are needed. A package is a set of R functions and data-sets and the library is a folder on your system / computer which stores the files for those package(s). Packages can be installed thanks to the install.packages() basic function.
 
-There are a lot of R functions. Each function has a help page describing this function, its arguments and provides some examples. The *help()* function and *?* help operator in R provide access to the documentation pages for R functions, data sets, and other objects.
+There are a lot of R functions. A function in R is one of the most used objects. It's very important to understand the purpose and syntax of R functions. Each function has a help page describing this function, its arguments and provides some examples. The *help()* function and *?* help operator in R provide access to the documentation pages for R functions.
 
 As you get more familiar with R, you’ll begin to memorize basic functions - and Google is always there for the rest.
 
@@ -306,6 +306,21 @@ sd(sleepapnea_clean$age, na.rm=TRUE)
 median(sleepapnea_clean$age, na.rm=TRUE)
 quantile(sleepapnea_clean$age, na.rm=TRUE) #the quantile() function provides by default quartiles, min and max
 quantile(sleepapnea_clean$age, probs= c(0, 0.3, 0.6), na.rm=TRUE) #extra example 
+```
+
+A note about missing values: In *R*, missing values are represented by a reserved (special) value - NA. The following are useful base R functions when assessing or handling missing values: is.na() and !is.na(). For a specific variable, use is.na() to identify missing values, or use its opposite (with ! in front) to identify non-missing values. These both return a logical value (TRUE or FALSE). Remember that you can sum() the resulting vector to count the number TRUE. The gg_miss_var() function (from the *naniar* package) will show you the number (or %) of missing values in each column of your data set/data frame.
+
+```{r na}
+#For the age variable
+sum(is.na(sleepapnea_clean$age))
+
+#For the SleepApnea variable
+sum(is.na(sleepapnea_clean$SleepApnea))
+
+#For the whole original data set (*sleepapnea*)
+library(naniar)
+gg_miss_var(sleepapnea)
+
 ```
 
 e.  What is the best graph for the variable age?
@@ -887,9 +902,15 @@ fisher.test(sleepapnea_clean$bad_shape, sleepapnea_clean$SleepApnea_grp)
 
 ## Part E - Linear regression analysis
 
+Simple linear regression is a statistical approach that allows to assess the linear relationship between two quantitative variables. More precisely, it enables the relationship to be quantified and its significance to be evaluated. Linear regression is one of the most basic statistical models out there and it has been around since the 19th century. 
+
+Simple linear regression is an asymmetric procedure in which: 
+- one of the variable is considered the response or the variable to be explained. It is also called **dependent variable**, and is represented on the y-axis.
+- the other variable is the explanatory or also called **independent variable**, and is represented on the x-axis.
+
 ### Is there a linear association between sleep apnea and bmi?
 
-a. Which variable is the dependent variable ? Which variable is the independent variable?
+a. Which variable is the dependent variable here ? Which variable is the independent one?
 
 ```{r SleepApneaBmi, exercise = TRUE}
 
@@ -947,6 +968,8 @@ d. Formulate the statistical hypotheses to test the linear association between *
 
 ```
 
+A linear regression can be calculated in R with the command lm.
+
 e. Apply a simple linear regression model using the function called lm() and visually assess the quality of the linear regression using the plot() function.
 
 ```{r SleepApnealogBmiReg, exercise = TRUE}
@@ -978,6 +1001,19 @@ f. Interpret the results.
 #For 1 unit increase in bmi, there is 0.029 increase in SleepApnea_log
 
 ```
+
+g. What represents the "Intercept" of your model ?
+
+```{r SleepApnealogBmiIntercept, exercise = TRUE}
+
+```
+
+```{r SleepApnealogBmiIntercept-solution}
+
+#The intercept is the mean value of the dependent variable Y (SleepApnea_log, here) when the independent variable X (bmi, here) takes the value 0.
+
+```
+
 ### Is there a linear association between sleep apnea and age? 
 
 Following the same steps as in the previous section, test the presence of a linear association between sleep apnea and age.
@@ -1095,7 +1131,7 @@ question("What are the main assumptions of logistic regression? (select the two 
 )
 ```
 
-a. Using the glm() function, run a logistic regression to investigate the association between sleep apnea and age.
+a. Using the glm() function, run a logistic regression to investigate the association between sleep apnea and age. For logistic regression, use the following argument : family = "binomial".
 
 ```{r SleepApneaLogisticAge, exercise = TRUE}
 
@@ -1169,9 +1205,64 @@ exp(confint(logit5))
 
 ```
 
+d. Instead of running various models one after the other (solution - question c), a good practice is to create a loop.
+
+```{r SleepApneaLogisticVariousloop, exercise = TRUE}
+
+```
+```{r SleepApneaLogisticVariousloop-solution}
+#Loading necessary packages
+library(purrr)
+library(tidyr)
+library(broom)
+
+#To run the models on several exposure variables to produce univariate odds ratios, you can use the approach below : 
+
+explanatory_vars <- c("age", "bmi", "cholesterol", "CardiacFreq") #Create a vector of column names of the explanatory variables
+explanatory_vars %>% str_c("SleepApnea_grp01 ~ ", .)
+
+models <- explanatory_vars %>%       # begin with variables of interest
+  str_c("SleepApnea_grp01 ~ ", .) %>%         # combine each variable into formula ("outcome ~ variable of interest")
+  
+  # iterate through each univariate formula
+  map(                               
+    .f = ~glm(                       # pass the formulas one-by-one to glm()
+      formula = as.formula(.x),      # within glm(), the string formula is .x
+      family = "binomial",           # specify type of glm (logistic)
+      data = sleepapnea_clean)) %>%          # dataset
+  
+  # tidy up each of the glm regression outputs from above
+  map(
+    .f = ~tidy(
+      .x, 
+      exponentiate = T,           # exponentiate 
+      conf.int = T)) %>%          # return confidence intervals
+  
+  # collapse the list of regression outputs in to one data frame
+  bind_rows() 
+
+  models
+```
+
 Note: Some analyses conducted in *Part F* are often called **sensitivity analyses** in research papers. **Sensitivity analyses** play a crucial role in assessing the robustness of the findings or conclusions based on primary analyses of data in clinical trials or epidemiological studies. They are a critical way to assess the impact, effect or influence of key assumptions or variations—such as different methods of analysis, definitions of outcomes, protocol deviations, missing data, and outliers—on the overall conclusions of a study.
 
 ## Part G: Multiple linear and logistic regressions
+
+Multiple (linear) regression can be used to assess the relationship between two variables while taking into account the effect of other variables. By taking into account the effect of other variables (i.e., *adjusting for* other potential variables influencing the studied relation), we cancel out the effect of these other variables in order to isolate and measure the relation between the two variables of interest. This point is the main difference with simple linear regression.
+
+Let's focus on the relation between sleep apnea (continuous) and bmi.
+
+```{r MultiLinRegExample}
+
+model_multi <- lm(SleepApnea_log ~ bmi + age + gender, data = sleepapnea_clean)
+model_multi
+summary(model_multi)
+coefficients(model_multi)          # Mean effects size
+confint(model_multi, level = 0.95) # Compute confidence intervals
+
+```
+
+Here, even though we **controlled for** or **adjusted for** *age* and *gender*, *bmi* is still associated with *SleepApnea_log*. The *bmi* coefficient is, however, slightly different (bigger) from the one obtained in *Part E* - question e (0.034 vs. 0.029).
 
 ### In progress
 
