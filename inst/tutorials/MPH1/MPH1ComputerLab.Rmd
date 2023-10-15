@@ -1250,7 +1250,7 @@ Note: Some analyses conducted in *Part F* are often called **sensitivity analyse
 
 Multiple (linear) regression can be used to assess the relationship between two variables while taking into account the effect of other variables. By taking into account the effect of other variables (i.e., *adjusting for* other potential variables influencing the studied relation), we cancel out the effect of these other variables in order to isolate and measure the relation between the two variables of interest. This point is the main difference with simple linear regression.
 
-Let's focus on the relation between sleep apnea (continuous) and bmi.
+Let's focus on the relation between sleep apnea (continuous) and bmi. Age and gender are potential *confounders* with regards to the latter relation (based on the litterature - cf the *Introduction* section about sleep apnea).
 
 ```{r MultiLinRegExample}
 
@@ -1262,7 +1262,95 @@ confint(model_multi, level = 0.95) # Compute confidence intervals
 
 ```
 
-Here, even though we **controlled for** or **adjusted for** *age* and *gender*, *bmi* is still associated with *SleepApnea_log*. The *bmi* coefficient is, however, slightly different (bigger) from the one obtained in *Part E* - question e (0.034 vs. 0.029).
+Here, even though we **controlled for** or **adjusted for** *age* and *gender*, *bmi* is still associated with *SleepApnea_log*. The *bmi* coefficient is, however, slightly different (higher) from the one obtained in *Part E* - question e (0.034 vs. 0.029) and its interpretation changed : For 1 unit increase in *bmi*, there is 0.034 increase in *SleepApnea_log*, holding all other x variaables constant.
 
-### In progress
+What may be the problem when including various independent variables (i.e., the potential confounders) in a model ?
+
+```{r MultiLinRegProb, exercise = TRUE}
+
+```
+```{r MultiLinRegProb-solution}
+
+# If the explanatory variables are perfectly correlated, you will face these problems:
+# -Inflated coefficients
+# -Underestimated Student T test (non-significant p-values)
+# -Values and signs of the coefficients are incoherent with common knowledge
+# -Unsteady results, adding or deleting observation strongly modify the values and signs of the coefficients
+
+#One way to detect multi-colinearity in R is using the following lines:
+library(car)
+vif(model) #all VIF values are below 10, it seems that multi-colinearity is thus not a concern here
+
+```
+
+Depending on your goal/research question, the approach that you take to fitting a model may change:
+- **Predictive** : including all predictors of your outcome/dependent variable is needed.
+- **Comparative/Hypothesis Testing** (the case in the example above) : including only true confounders of the x-y relation is of importance. However, it can be difficult to control for all of these factors in any study. *"All models are wrong, but some are useful"*.
+
+Let's now change our objective to *"predict sleep apnea"*.
+
+Here again, we would like to avoid considering too many variables, and thus, **overfitting**, i.e., the model fits too closely or exactly a particular set of data,
+and may therefore fail to fit to additional data or predict future observations reliably. The variance of any one model would tell us how robust the performance of this particular model is, meaning if we were to slightly change the values of our data points, how much would our performance fluctuate?
+
+One way to counter **overfitting** is automatic variable selection (backward, forward, stepwise).
+
+Conduct such an approach with *SleepApnea_log* as a dependent variable (use the step() function).
+
+```{r MultiLinRegSelection, exercise = TRUE}
+
+```
+```{r MultiLinRegSelection-solution}
+
+#The step() function can not proceed with a data set presenting missing values
+#We thus have to create a new data set only containing "complete cases" (units with values for all the considered variables)
+sleepapnea_clean_noNA <- na.omit(sleepapnea_clean) 
+
+#Conducting the selection
+modelsel = lm(SleepApnea_log ~ bmi + age + gender + cholesterol + creatinine + CardiacFreq + diabetes + Triglyceride_Cl_Ref, data= sleepapnea_clean_noNA)
+modelStep <- step(modelsel, direction = "both")
+
+#The model containing the following variables was retained : bmi, age, gender, creatinine, CardiacFreq, Triglyceride_Cl_Ref
+
+```
+
+Is the model retained above (in the previous exercise) better than the full one (i.e., containing all the potential predictors: *bmi*, *age*, *gender*, *creatinine*, *CardiacFreq*, *Triglyceride_Cl_Ref* but also *diabetes* and *cholesterol* ? Use the AIC() function to respond.
+
+```{r MultiLinRegSelectionbest, exercise = TRUE}
+
+```
+```{r MultiLinRegSelectionbest-solution}
+
+#Need to run a model with all potential predictors (with the "complete-cases" data set)
+modelfull <- lm(SleepApnea_log ~ bmi + age + gender + cholesterol + creatinine + CardiacFreq + diabetes + Triglyceride_Cl_Ref, data = na.omit(sleepapnea_clean))
+modelfull
+
+AIC(modelfull, modelStep) #the smaller the better 
+#Conclusion: the full model is not the better one (highest AIC)
+
+```
+
+**Practice**: Repeat the analyses with the *SleepApnea_grp01* variable. Comment.
+
+```{r MultiLinRegSelectionLogbest, exercise = TRUE}
+
+```
+```{r MultiLinRegSelectionLogbest-solution}
+modelselLog = glm(SleepApnea_grp01 ~ bmi + age + gender + cholesterol + creatinine + CardiacFreq + diabetes + Triglyceride_Cl_Ref, family= "binomial", data= na.omit(sleepapnea_clean))
+modelStepLog <- step(modelselLog, direction = "both")
+modelStepLog
+
+#Need to run a model with all potential predictors (with the "complete-cases" data set)
+modelfullLog <- glm(SleepApnea_grp01 ~ bmi + age + gender + cholesterol + creatinine + CardiacFreq + diabetes + Triglyceride_Cl_Ref, family= "binomial", data= na.omit(sleepapnea_clean))
+modelfullLog
+
+AIC(modelfullLog, modelStepLog) #the smaller the better 
+
+#Interpretation/conclusion: 
+#Contrary to what was obtained with the continuous SleepApnea_log variable,
+#only the following variables were retained by the automatic variable selection: bmi, gendermale, creatinine, CardiacFreq
+
+```
+
+A final note: While helping in managing overfitting, automated procedures also exclude observations that are missing any of the predictors considered, not just those that end up in the final model; this can (drastically) reduce the sample size and, in turn, somehow, still increase the likelihood of overfitting.
+Readers and authors should be skeptical of models fit with automated selection procedures, including forward, backward, or stepwise selection. These models are highly likely to be overfit, including containing variables that have no relationship with the outcome and variables for which the effect sizes have been overestimated. In particular, if the number of predictors considered is large and the sample size is small to moderate, then the results are unlikely to be reproducible. Researchers should instead rely on expert judgment during model building and/or should work closely with a statistician. Newer automated procedures for model selection exist but have yet to be widely adopted in the medical literature (Sainani, 2013).
 
