@@ -990,7 +990,17 @@ layout(1)
 
 ```
 
-f. Interpret the results.
+**Note :** In contrast to p-values, confidence intervals indicate the direction of the effect studied. Conclusions about statistical significance are also possible with the help of the confidence interval. If the confidence interval does not include the value of zero effect, it can be assumed that there is a statistically significant result (cf null hypothesis, i.e., is Beta different from 0 or not ?).
+
+**Reminder :**
+
+-The confidence interval is a range of values calculated by statistical methods which includes the desired true parameter (here, the beta) with a probability defined in advance. The confidence level of 95% is usually selected. This means that the confidence interval covers the true value in 95 of 100 studies performed.  
+
+-The size of the confidence interval depends on the sample size and the standard deviation of the study groups. If the sample size is large, this leads to "more confidence" and a narrower confidence interval. If the confidence interval is wide, this may mean that the sample is small. If the dispersion is high, the conclusion is less certain and the confidence interval becomes wider. Finally, the size of the confidence interval is influenced by the selected level of confidence. A 99% confidence interval is wider than a 95% confidence interval. In general, with a higher probability to cover the true value the confidence interval becomes wider.
+
+(*du Prel et al., 2009*)
+
+f. Interpret the results and the quality of your linear regression.
 
 ```{r SleepApnealogBmiInt, exercise = TRUE}
 
@@ -1000,6 +1010,27 @@ f. Interpret the results.
 
 #For 1 unit increase in bmi, there is 0.029 increase in SleepApnea_log
 
+#All the assumptions seems fulfilled.
+
+```
+
+If you are not a hundred percent sure about your residual diagnostic, you can perform some statistical tests. For 
+
+```{r assumptionstests}
+
+#check the normality of residuals numerically:
+#H0 : the distribution of the residuals is normal
+#H1 : the distribution of the residuals is not normal
+
+shapiro.test(model$residuals)
+
+#check the homoscedasticity of the residuals numerically
+library(car)
+ncvTest(model)
+
+#check the independence of the residuals 
+library(lmtest)
+dwtest(model)
 ```
 
 g. What represents the "Intercept" of your model ?
@@ -1102,7 +1133,7 @@ plot(model)
 layout(1)
 
 #Interpret the results
-#For 1 unit increase in cardiac frequency, there is 0.009 increase in SleepApnea_log
+#For 1 unit increase in cardiac frequency, there is 0.009 increase in SleepApnea_log 
 
 ```
 
@@ -1265,7 +1296,24 @@ confint(model_multi, level = 0.95) # Compute confidence intervals
 
 ```
 
-Here, even though we **controlled for** or **adjusted for** *age* and *gender*, *bmi* is still associated with *SleepApnea_log*. The *bmi* coefficient is, however, slightly different (higher) from the one obtained in *Part E* - question e (0.034 vs. 0.029) and its interpretation changed : For 1 unit increase in *bmi*, there is 0.034 increase in *SleepApnea_log*, holding all other x variaables constant.
+Here, even though we **controlled for** or **adjusted for** *age* and *gender*, *bmi* is still associated with *SleepApnea_log*. The *bmi* coefficient is, however, slightly different (higher) from the one obtained in *Part E* - question e (0.034 vs. 0.029) and its interpretation changed : For 1 unit increase in *bmi*, there is 0.034 increase in *SleepApnea_log*, holding all other x variables constant (or adjusting for *age* and *gender*).
+
+The intercept in the previous summary output can be interpreted as (even though biologically there is no sense in the following sentence): the average number of abnormal pauses during sleep for female, when their bmi=0 and age=0. The summary output of our regression allows us to identify the reference category used for a factor variable x, here *gender* : the reference category is the one not appearing in the regression output. **Tips:** Most of the time, we need to manually set the reference factor level in the linear regression model. To do so we use the relevel() function of the R Language. The relevel() function is used to reorder levels of a factor vector. The levels of a factor vector are re-ordered so that the level specified by the user is first and the others are moved down one step.
+
+**Important note:** Presenting and interpreting estimates of effect measures for secondary risk factors (confounders - here age and gender) obtained from the same model as that used to estimate the primary exposure (here, our association of interest is "bmi -> sleep apnea") effects can lead readers astray in a number of ways. The interpretation of a confounder effect estimate may be different than for the exposure effect estimate (possibility of residual confounding and, in some circumstances, total effects are not warranted).
+
+**Final note:** Make sure that, statiscally speaking, there is a sense in interpreting a coefficient (i.e., if p value > 0.05, there is no need to interpret the coefficient(s)).
+
+Don't forget to check the assumptions for this model.
+
+```{r MultiLinRegExample}
+
+#Visually
+plot(model_multi)
+#Numerically
+#Cf Part E - simple linear regression
+
+```
 
 What may be the problem when including various independent variables (i.e., the potential confounders) in a model ?
 
@@ -1283,6 +1331,10 @@ What may be the problem when including various independent variables (i.e., the 
 #One way to detect multi-colinearity in R is using the following lines:
 library(car)
 vif(model) #all VIF values are below 10, it seems that multi-colinearity is thus not a concern here
+
+#Or you can use the mctest package and the imcdiag() function
+library(mctest)
+imcdiag(model_multi)
 
 ```
 
@@ -1316,7 +1368,9 @@ modelStep <- step(modelsel, direction = "both")
 
 ```
 
-Is the model retained above (in the previous exercise) better than the full one (i.e., containing all the potential predictors: *bmi*, *age*, *gender*, *creatinine*, *CardiacFreq*, *Triglyceride_Cl_Ref* but also *diabetes* and *cholesterol* ? Use the AIC() function to respond.
+Is the model retained above (in the previous exercise) better than the full one (i.e., containing all the potential predictors: *bmi*, *age*, *gender*, *creatinine*, *CardiacFreq*, *Triglyceride_Cl_Ref* but also *diabetes* and *cholesterol* ? 
+Use the AIC() function to respond. The **Akaike information criterion (AIC)** is a good test for model fit. AIC calculates the information value of each model by balancing the variation explained against the number of parameters used.
+Using the anova() function is also possible - models being compared need to be *"nested"*.
 
 ```{r MultiLinRegSelectionbest, exercise = TRUE}
 
@@ -1327,8 +1381,23 @@ Is the model retained above (in the previous exercise) better than the full one 
 modelfull <- lm(SleepApnea_log ~ bmi + age + gender + cholesterol + creatinine + CardiacFreq + diabetes + Triglyceride_Cl_Ref, data = na.omit(sleepapnea_clean))
 modelfull
 
+#Checking with the AIC() function
 AIC(modelfull, modelStep) #the smaller the better 
 #Conclusion: the full model is not the better one (highest AIC)
+
+#Checking with the anova() function to select the best (nested) model
+#If you have two or more models that are subsets of a larger model, 
+#you can use anova() to check if the additional variable(s) contribute to the predictive ability of the model. 
+
+anova(modelfull, modelStep)
+
+#For each row in the output, the anova() tests a hypothesis comparing two models.
+#The null hypothesis is that the two models are equal in fitting the data (i.e. the Y variable),
+#while, the alternative hypothesis is that the full model is better (i.e. the additional X variable(s) improve(s) the model).
+#If we fail to reject the null hypothesis, it is then better to keep the model with less variables.
+#If we reject the null hypothesis, model 2 (the one selected after the stepwise procedure) indeed provides a significantly better fit to the data compared to model 1 (the full model).
+
+#The anova() test can add to the evidence from the AIC() output.
 
 ```
 
