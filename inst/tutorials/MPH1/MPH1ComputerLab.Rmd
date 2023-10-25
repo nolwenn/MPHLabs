@@ -970,7 +970,7 @@ d. Formulate the statistical hypotheses to test the linear association between *
 
 A linear regression can be calculated in R with the command lm.
 
-e. Apply a simple linear regression model using the function called lm() and visually assess the quality of the linear regression using the plot() function.
+e. Apply a simple linear regression model using the function called lm() and visually assess the quality (the assumptions) of the linear regression using the plot() function.
 
 ```{r SleepApnealogBmiReg, exercise = TRUE}
 
@@ -1014,7 +1014,7 @@ f. Interpret the results and the quality of your linear regression.
 
 ```
 
-If you are not a hundred percent sure about your residual diagnostic, you can perform some statistical tests. For 
+If you are not a hundred percent sure about your residual diagnostic, you can perform some statistical tests.  
 
 ```{r assumptionstests}
 
