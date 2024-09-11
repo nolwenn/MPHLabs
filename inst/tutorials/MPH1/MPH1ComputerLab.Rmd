@@ -360,7 +360,10 @@ g.  Compute the confidence interval of the age variable knowing the formula foll
 
 -   $1.96*\sigma/\sqrt{n}$
 
-```{r agebyci}
+```{r agebyci, exercise = TRUE}
+```
+
+```{r agebyci-solution}
 bound <- 1.96*sd(sleepapnea_clean$age)/sqrt(length(sleepapnea_clean$age))
 # upper bound
 mean(sleepapnea_clean$age)+bound 
