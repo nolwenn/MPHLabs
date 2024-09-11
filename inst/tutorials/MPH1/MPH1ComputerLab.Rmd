@@ -1287,7 +1287,7 @@ Note: Some analyses conducted in *Part F* are often called **sensitivity analyse
 
 Multiple (linear) regression can be used to assess the relationship between two variables while taking into account the effect of other variables. By taking into account the effect of other variables (i.e., *adjusting for* other potential variables influencing the studied relation), we cancel out the effect of these other variables in order to isolate and measure the relation between the two variables of interest. This point is the main difference with simple linear regression.
 
-Let's focus on the relation between sleep apnea (continuous) and bmi. Age and gender are potential *confounders* with regards to the latter relation (based on the litterature - cf the *Introduction* section about sleep apnea).
+Let's focus on the relation between sleep apnea (continuous) and bmi. Age and gender are potential *confounders* with regards to the latter relation (based on the literature - cf the *Introduction* section about sleep apnea).
 
 ```{r MultiLinRegExample}
 
@@ -1309,7 +1309,7 @@ The intercept in the previous summary output can be interpreted as (even though 
 
 Don't forget to check the assumptions for this model.
 
-```{r MultiLinRegExample}
+```{r MultiLinRegExample-assumption}
 
 #Visually
 plot(model_multi)
